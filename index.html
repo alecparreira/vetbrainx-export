@@ -630,15 +630,22 @@ function detectFonts(doc) {
 function renderAnalysis(a) {
   document.getElementById('a-name').textContent = a.name;
   document.getElementById('a-count').textContent = a.count;
-  
+
   var grid = document.getElementById('a-grid');
   grid.innerHTML = '';
   for (var i = 0; i < a.count; i++) {
     var lbl = 'Slide ' + (i+1);
     try { if (a.slides[i] && a.slides[i].getAttribute) lbl = a.slides[i].getAttribute('data-screen-label') || lbl; } catch(e) {}
-    grid.innerHTML += '<div class="slide-thumb"><div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">' + lbl + '</div></div>';
+    grid.innerHTML += '<div class="slide-thumb" id="thumb-' + i + '" style="position:relative;background:#1A1A1E"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#6A6A74" stroke-width="1.5" style="width:24px;height:24px;animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div></div>';
   }
-  
+  // Add spin animation if not exists
+  if (!document.getElementById('spin-style')) {
+    var s = document.createElement('style');
+    s.id = 'spin-style';
+    s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+
   document.getElementById('a-info').innerHTML =
     '<div class="info-row"><span>Resolucao</span><span>' + a.res.w + 'x' + a.res.h + '</span></div>' +
     '<div class="info-row"><span>Orientacao</span><span>' + a.orient + '</span></div>' +
@@ -646,6 +653,63 @@ function renderAnalysis(a) {
     '<div class="info-row"><span>Imagens</span><span>' + a.imgs + '</span></div>' +
     '<div class="info-row"><span>SVGs</span><span>' + a.svgs + '</span></div>' +
     '<div class="info-row"><span>JavaScript</span><span>' + (a.hasJS ? 'Sim' : 'Nao') + '</span></div>';
+
+  // Render actual previews
+  renderThumbnails(a);
+}
+
+async function renderThumbnails(a) {
+  // Create staging container
+  var stage = document.createElement('div');
+  stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
+  document.body.appendChild(stage);
+
+  var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  stage.innerHTML = clean;
+  await new Promise(function(r) { setTimeout(r, 2000); });
+  stage.offsetHeight;
+
+  var liveSlides = detectSlidesIn(stage);
+
+  for (var i = 0; i < a.count; i++) {
+    var thumb = document.getElementById('thumb-' + i);
+    if (!thumb) continue;
+
+    try {
+      var slideEl = liveSlides[i] || stage;
+      slideEl.style.display = 'flex';
+      slideEl.style.width = a.res.w + 'px';
+      slideEl.style.height = a.res.h + 'px';
+      // Hide siblings
+      for (var j = 0; j < liveSlides.length; j++) {
+        if (j !== i && liveSlides[j] && liveSlides[j].style) liveSlides[j].style.display = 'none';
+      }
+      slideEl.offsetHeight;
+
+      if (typeof html2canvas !== 'undefined') {
+        var canvas = await html2canvas(slideEl, {
+          width: a.res.w, height: a.res.h, scale: 0.15,
+          useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false
+        });
+        thumb.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+        thumb.innerHTML = '<div style="position:absolute;bottom:4px;left:4px;right:4px;text-align:center;font-size:9px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.5);border-radius:4px;padding:2px 4px">Slide ' + (i+1) + '</div>';
+      } else {
+        thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">' + (liveSlides[i] ? 'Carregado' : 'Slide ' + (i+1)) + '</div>';
+      }
+    } catch(e) {
+      console.warn('Thumb', i, 'error:', e);
+      thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
+    }
+  }
+
+  // Show all slides again (cleanup)
+  for (var j = 0; j < liveSlides.length; j++) {
+    if (liveSlides[j] && liveSlides[j].style) liveSlides[j].style.display = '';
+  }
+  document.body.removeChild(stage);
 }
 
 // ========== FORMAT / SCALE SELECTION ==========
