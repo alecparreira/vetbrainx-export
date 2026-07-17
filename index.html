@@ -13,6 +13,8 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CC1A1A' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -578,7 +580,7 @@
               <div class="export-config-card">
                 <div class="export-config-title">Configuracao da Exportacao</div>
                 <div class="form-group"><label class="form-label">Formato</label><div class="format-pills" id="formatPills"><div class="format-pill selected" data-format="png" onclick="App.selectFormat(this)">PNG</div><div class="format-pill" data-format="jpg" onclick="App.selectFormat(this)">JPG</div><div class="format-pill" data-format="webp" onclick="App.selectFormat(this)">WEBP</div><div class="format-pill" data-format="pdf" onclick="App.selectFormat(this)">PDF</div><div class="format-pill" data-format="pptx" onclick="App.selectFormat(this)">PPTX</div><div class="format-pill" data-format="canva" onclick="App.selectFormat(this)">Canva</div></div></div>
-                <div class="form-group"><label class="form-label">Escala</label><div class="scale-options" id="scaleOptions"><div class="scale-option" data-scale="1" onclick="App.selectScale(this)"><div class="scale-option-value">1x</div><div class="scale-option-label">1080px</div></div><div class="scale-option selected" data-scale="2" onclick="App.selectScale(this)"><div class="scale-option-value">2x</div><div class="scale-option-label">2160px</div></div><div class="scale-option" data-scale="3" onclick="App.selectScale(this)"><div class="scale-option-value">3x</div><div class="scale-option-label">3240px</div></div><div class="scale-option" data-scale="4" onclick="App.selectScale(this)"><div class="scale-option-value">4x</div><div class="scale-option-label">4320px</div></div></div></div>
+                <div class="form-group"><label class="form-label">Escala</label><div class="scale-options" id="scaleOptions"><div class="scale-option selected" data-scale="1" onclick="App.selectScale(this)"><div class="scale-option-value">1x</div><div class="scale-option-label">Original</div></div><div class="scale-option" data-scale="2" onclick="App.selectScale(this)"><div class="scale-option-value">2x</div><div class="scale-option-label">Dobro</div></div><div class="scale-option" data-scale="3" onclick="App.selectScale(this)"><div class="scale-option-value">3x</div><div class="scale-option-label">Triplo</div></div><div class="scale-option" data-scale="4" onclick="App.selectScale(this)"><div class="scale-option-value">4x</div><div class="scale-option-label">Quadruplo</div></div></div></div>
                 <div class="form-group"><label class="form-label">Qualidade</label><select class="form-select" id="qualitySelect"><option value="1">Maxima (lossless)</option><option value="0.95">Alta (95%)</option><option value="0.85">Media (85%)</option></select></div>
               </div>
               <button class="btn btn-primary btn-lg" style="width:100%" onclick="App.openInEditor()">
@@ -696,7 +698,7 @@
             <div class="progress-overview">
               <div class="progress-stat"><div class="progress-stat-value accent" id="progressSlides">0</div><div class="progress-stat-label">Slides concluidos</div></div>
               <div class="progress-stat"><div class="progress-stat-value" id="progressTime">00:00</div><div class="progress-stat-label">Tempo restante</div></div>
-              <div class="progress-stat"><div class="progress-stat-value success" id="progressScale">2x</div><div class="progress-stat-label">Escala</div></div>
+              <div class="progress-stat"><div class="progress-stat-value success" id="progressScale">1x</div><div class="progress-stat-label">Escala</div></div>
             </div>
             <div class="progress-bar-container">
               <div class="progress-bar-header"><span class="progress-bar-label">Progresso</span><span class="progress-bar-percent" id="progressPercent">0%</span></div>
@@ -790,10 +792,10 @@
     </div>
   </nav>
 
-  <!-- CDN LIBRARIES -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- CDN LIBRARIES (async para nao bloquear render) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" async></script>
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
 
   <script>
     // =========================================================
@@ -1339,7 +1341,7 @@
     const App = {
       state: {
         currentFile: null, currentFileName: '', analysis: null,
-        exportFormat: 'png', exportScale: 2, exportQuality: 1,
+        exportFormat: 'png', exportScale: 1, exportQuality: 1,
         exportedImages: [], exportedPDF: null, exportedPPTX: null,
         history: [], totalSlidesExported: 0, totalFilesProcessed: 0,
         batchFiles: [], isExporting: false, cancelRequested: false
