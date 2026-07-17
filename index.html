@@ -401,6 +401,7 @@
 </head>
 <body>
   <input type="file" id="fileInput" class="file-input-hidden" accept=".html,.htm" />
+  <input type="file" id="batchFileInput" class="file-input-hidden" accept=".html,.htm" multiple />
   <input type="file" id="imageInput" class="file-input-hidden" accept="image/*" />
 
   <div class="app-shell" id="app">
@@ -521,10 +522,10 @@
               <div class="drop-zone-title">Arraste seu arquivo HTML aqui</div>
               <div class="drop-zone-subtitle">Solte o arquivo do carrossel produzido por qualquer ferramenta de design</div>
               <div class="drop-zone-or">ou</div>
-              <button class="btn btn-primary btn-lg" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+              <label for="fileInput" class="btn btn-primary btn-lg" style="cursor:pointer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                 Selecionar Arquivo
-              </button>
+              </label>
               <div class="drop-zone-formats"><span class="format-tag">HTML</span><span class="format-tag">HTM</span></div>
             </div>
           </div>
@@ -740,9 +741,8 @@
               <div class="drop-zone-title">Arraste multiplos arquivos HTML</div>
               <div class="drop-zone-subtitle">Ou selecione varios arquivos de uma vez</div>
               <div class="drop-zone-or">ou</div>
-              <button class="btn btn-primary" onclick="event.stopPropagation();document.getElementById('batchFileInput').click()">Selecionar Arquivos</button>
+              <label for="batchFileInput" class="btn btn-primary" style="cursor:pointer">Selecionar Arquivos</label>
             </div>
-            <input type="file" id="batchFileInput" class="file-input-hidden" accept=".html,.htm" multiple />
             <div id="batchFilesList" style="display:none">
               <div class="section-header">
                 <div class="section-title" id="batchTitle">Arquivos (0)</div>
@@ -792,10 +792,10 @@
     </div>
   </nav>
 
-  <!-- CDN LIBRARIES (async para nao bloquear render) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" async></script>
-  <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js" async></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
+  <!-- CDN LIBRARIES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
 
   <script>
     // =========================================================
@@ -2016,114 +2016,70 @@
       saveStats() { try { localStorage.setItem('vetbrainx-stats', JSON.stringify({ totalSlidesExported: this.state.totalSlidesExported, totalFilesProcessed: this.state.totalFilesProcessed, history: this.state.history.slice(0, 50) })); } catch (e) {} },
 
       init() {
-        try {
-          this.initTheme();
-          this.loadStats();
+        this.initTheme();
+        this.loadStats();
 
-          // File input - main upload
-          const fileInput = document.getElementById('fileInput');
-          if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-              const file = e.target.files && e.target.files[0];
-              if (file) this.handleFile(file);
-              e.target.value = '';
-            });
+        // === FILE INPUTS ===
+        // Main file upload
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+          var file = this.files[0];
+          if (file) App.handleFile(file);
+          this.value = '';
+        });
+
+        // Batch upload
+        document.getElementById('batchFileInput').addEventListener('change', function(e) {
+          if (this.files.length > 0) App.handleBatchFiles(this.files);
+          this.value = '';
+        });
+
+        // Image upload (editor)
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+          var file = this.files[0];
+          if (file) {
+            var reader = new FileReader();
+            reader.onload = function(ev) { Editor.addImage(ev.target.result); };
+            reader.readAsDataURL(file);
           }
+          this.value = '';
+        });
 
-          // Batch file input
-          const batchInput = document.getElementById('batchFileInput');
-          if (batchInput) {
-            batchInput.addEventListener('change', (e) => {
-              if (e.target.files && e.target.files.length > 0) this.handleBatchFiles(e.target.files);
-              e.target.value = '';
-            });
-          }
-
-          // Image input (editor)
-          const imageInput = document.getElementById('imageInput');
-          if (imageInput) {
-            imageInput.addEventListener('change', (e) => {
-              const file = e.target.files && e.target.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = ev => Editor.addImage(ev.target.result);
-                reader.readAsDataURL(file);
-              }
-              e.target.value = '';
-            });
-          }
-
-          // Paste area character count
-          const pasteArea = document.getElementById('htmlPasteArea');
-          if (pasteArea) {
-            pasteArea.addEventListener('input', () => this.updatePasteCharCount());
-            pasteArea.addEventListener('paste', () => {
-              setTimeout(() => this.updatePasteCharCount(), 100);
-            });
-          }
-
-          // Drop zone - upload
-          const dropZone = document.getElementById('dropZone');
-          if (dropZone) {
-            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-            dropZone.addEventListener('drop', e => {
-              e.preventDefault();
-              dropZone.classList.remove('drag-over');
-              const file = e.dataTransfer.files && e.dataTransfer.files[0];
-              if (file) this.handleFile(file);
-            });
-            // Use a flag to prevent double-trigger when button is clicked
-            let fileDialogOpen = false;
-            dropZone.addEventListener('click', (e) => {
-              // If the click target is a button or inside a button, let the button handle it
-              if (e.target.closest('button') || e.target.closest('.btn')) return;
-              if (fileDialogOpen) return;
-              fileDialogOpen = true;
-              fileInput.click();
-              // Reset flag after dialog closes (or after timeout)
-              setTimeout(() => { fileDialogOpen = false; }, 1000);
-            });
-          }
-
-          // Batch drop zone
-          const batchDrop = document.getElementById('batchDropZone');
-          if (batchDrop) {
-            batchDrop.addEventListener('dragover', e => { e.preventDefault(); batchDrop.classList.add('drag-over'); });
-            batchDrop.addEventListener('dragleave', () => batchDrop.classList.remove('drag-over'));
-            batchDrop.addEventListener('drop', e => {
-              e.preventDefault();
-              batchDrop.classList.remove('drag-over');
-              if (e.dataTransfer.files.length > 0) this.handleBatchFiles(e.dataTransfer.files);
-            });
-            let batchDialogOpen = false;
-            batchDrop.addEventListener('click', (e) => {
-              if (e.target.closest('button') || e.target.closest('.btn')) return;
-              if (batchDialogOpen) return;
-              batchDialogOpen = true;
-              batchInput.click();
-              setTimeout(() => { batchDialogOpen = false; }, 1000);
-            });
-          }
-
-          // Theme change listener
-          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            try { if (!localStorage.getItem('vetbrainx-theme')) document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); } catch (err) {}
-          });
-
-          console.log('[VetBrainX Export] App inicializado com sucesso');
-        } catch (err) {
-          console.error('[VetBrainX Export] Erro na inicializacao:', err);
+        // === PASTE AREA ===
+        var pasteArea = document.getElementById('htmlPasteArea');
+        if (pasteArea) {
+          pasteArea.addEventListener('input', function() { App.updatePasteCharCount(); });
+          pasteArea.addEventListener('paste', function() { setTimeout(function() { App.updatePasteCharCount(); }, 100); });
         }
+
+        // === DROP ZONES ===
+        var dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+        dropZone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+          if (e.dataTransfer.files[0]) App.handleFile(e.dataTransfer.files[0]);
+        });
+
+        var batchDrop = document.getElementById('batchDropZone');
+        batchDrop.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('drag-over'); });
+        batchDrop.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+        batchDrop.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+          if (e.dataTransfer.files.length > 0) App.handleBatchFiles(e.dataTransfer.files);
+        });
+
+        // === THEME ===
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          try { if (!localStorage.getItem('vetbrainx-theme')) document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); } catch (err) {}
+        });
+
+        console.log('[VetBrainX] Pronto');
       }
     };
 
-    // Wait for DOM then init
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => App.init());
-    } else {
-      App.init();
-    }
+    App.init();
   </script>
 </body>
 </html>
