@@ -1174,19 +1174,78 @@ function dlPPTX() { if (state.pptx) { dl(state.pptx, state.fileName.replace(/\.h
 function dl(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
 function cancelExport() { state.cancel = true; state.exporting = false; go('dash'); toast('Cancelado', 'warn'); }
 
-function openEditor() {
+async function openEditor() {
   go('editor');
   if (!E.inited) initEditor();
-  // Load analysis resolution into editor
-  if (state.analysis) {
-    E.w = state.analysis.res.w;
-    E.h = state.analysis.res.h;
-    document.getElementById('edW').value = E.w;
-    document.getElementById('edH').value = E.h;
-    E.canvas.style.width = E.w + 'px';
-    E.canvas.style.height = E.h + 'px';
+
+  var a = state.analysis;
+  if (!a) { toast('Nenhum arquivo para editar', 'err'); return; }
+
+  // Set canvas to match file resolution
+  E.w = a.res.w;
+  E.h = a.res.h;
+  document.getElementById('edW').value = E.w;
+  document.getElementById('edH').value = E.h;
+  E.canvas.style.width = E.w + 'px';
+  E.canvas.style.height = E.h + 'px';
+  E.els = [];
+  E.sel = null;
+  E.undoS = [];
+  E.redoS = [];
+  E.bg = '#ffffff';
+  E.canvas.style.background = '#ffffff';
+  document.getElementById('edBg').value = '#ffffff';
+
+  toast('Carregando design...');
+
+  // Render first slide as background image
+  try {
+    // Create staging container
+    var stage = document.createElement('div');
+    stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
+    document.body.appendChild(stage);
+
+    var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    stage.innerHTML = clean;
+
+    // Wait for render
+    await new Promise(function(r) { setTimeout(r, 2500); });
+    stage.offsetHeight; // force layout
+
+    // Find first slide
+    var slides = detectSlidesIn(stage);
+    var firstSlide = slides[0] || stage;
+    firstSlide.style.display = 'flex';
+    firstSlide.style.width = a.res.w + 'px';
+    firstSlide.style.height = a.res.h + 'px';
+
+    // Hide other slides
+    for (var i = 1; i < slides.length; i++) slides[i].style.display = 'none';
+
+    // Render to canvas with html2canvas
+    if (typeof html2canvas !== 'undefined') {
+      var canvas = await html2canvas(firstSlide, {
+        width: a.res.w, height: a.res.h, scale: 1,
+        useCORS: true, allowTaint: true,
+        backgroundColor: '#ffffff', logging: false
+      });
+      var imgEl = mkEl('image', 0, 0);
+      imgEl.w = a.res.w;
+      imgEl.h = a.res.h;
+      imgEl.src = canvas.toDataURL('image/png');
+      imgEl.locked = true;
+      E.els.push(imgEl);
+    }
+
+    document.body.removeChild(stage);
+  } catch(e) {
+    console.warn('Preview error:', e);
+    try { document.body.removeChild(stage); } catch(x) {}
   }
-  toast('Editor aberto - adicione elementos');
+
+  edRender();
+  edLayers();
+  toast('Design carregado - edite ou exporte');
 }
 
 // Editor export
