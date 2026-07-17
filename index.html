@@ -395,7 +395,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0C0C0E;color:#F0F0F2;h
     <div class="ed-panels">
       <div class="ed-panel"><div class="ed-panel-h">Propriedades</div><div class="ed-panel-b" id="edProps"><div style="text-align:center;padding:16px;color:#6A6A74;font-size:11px">Selecione um elemento</div></div></div>
       <div class="ed-panel"><div class="ed-panel-h">Camadas</div><div class="ed-panel-b" id="edLayers"></div></div>
-      <div class="ed-panel"><div class="ed-panel-h">Canvas</div><div class="ed-panel-b"><div class="pr"><label>W</label><input type="number" id="edW" value="1080" onchange="edResize()"><label>H</label><input type="number" id="edH" value="1080" onchange="edResize()"></div><div class="pr"><label>Fundo</label><input type="color" id="edBg" value="#ffffff" onchange="edCanvas.bg=this.value;E.canvas.style.background=this.value"></div></div></div>
+      <div class="ed-panel"><div class="ed-panel-h">Canvas</div><div class="ed-panel-b"><div class="pr"><label>W</label><input type="number" id="edW" value="1080" onchange="edResize()"><label>H</label><input type="number" id="edH" value="1080" onchange="edResize()"></div><div class="pr"><label>Cor</label><input type="color" id="edBg" value="#ffffff" onchange="E.bg=this.value;E.canvas.style.background=this.value"></div><div class="pr" style="margin-top:6px"><label>Img</label><button class="btn-ghost" style="flex:1;font-size:11px;padding:4px 8px" onclick="document.getElementById('bgImageInput').click()">Escolher fundo</button><button class="btn-ghost" style="font-size:11px;padding:4px 8px" onclick="E.bgImg='';E.canvas.style.backgroundImage='';toast('Fundo removido')">X</button></div><input type="file" id="bgImageInput" class="file-hidden" accept="image/*" onchange="setBgImage(this)"></div></div>
     </div>
   </div>
 </div>
@@ -659,57 +659,55 @@ function renderAnalysis(a) {
 }
 
 async function renderThumbnails(a) {
-  // Create staging container
-  var stage = document.createElement('div');
-  stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
-  document.body.appendChild(stage);
-
+  // Create ONE staging container per slide to avoid show/hide conflicts
   var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  stage.innerHTML = clean;
-  await new Promise(function(r) { setTimeout(r, 2000); });
-  stage.offsetHeight;
-
-  var liveSlides = detectSlidesIn(stage);
 
   for (var i = 0; i < a.count; i++) {
     var thumb = document.getElementById('thumb-' + i);
     if (!thumb) continue;
 
     try {
+      // Each slide gets its own container
+      var stage = document.createElement('div');
+      stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
+      document.body.appendChild(stage);
+      stage.innerHTML = clean;
+      await new Promise(function(r) { setTimeout(r, 800); });
+      stage.offsetHeight;
+
+      var liveSlides = detectSlidesIn(stage);
       var slideEl = liveSlides[i] || stage;
+
+      // Hide all except target
+      for (var j = 0; j < liveSlides.length; j++) {
+        if (liveSlides[j] !== slideEl) liveSlides[j].style.display = 'none';
+      }
       slideEl.style.display = 'flex';
       slideEl.style.width = a.res.w + 'px';
       slideEl.style.height = a.res.h + 'px';
-      // Hide siblings
-      for (var j = 0; j < liveSlides.length; j++) {
-        if (j !== i && liveSlides[j] && liveSlides[j].style) liveSlides[j].style.display = 'none';
-      }
       slideEl.offsetHeight;
 
       if (typeof html2canvas !== 'undefined') {
         var canvas = await html2canvas(slideEl, {
-          width: a.res.w, height: a.res.h, scale: 0.15,
+          width: a.res.w, height: a.res.h, scale: 0.4,
           useCORS: true, allowTaint: true,
           backgroundColor: '#ffffff', logging: false
         });
         thumb.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
         thumb.style.backgroundSize = 'cover';
         thumb.style.backgroundPosition = 'center';
-        thumb.innerHTML = '<div style="position:absolute;bottom:4px;left:4px;right:4px;text-align:center;font-size:9px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.5);border-radius:4px;padding:2px 4px">Slide ' + (i+1) + '</div>';
+        thumb.innerHTML = '<div style="position:absolute;bottom:4px;left:4px;right:4px;text-align:center;font-size:10px;font-weight:600;color:#fff;background:rgba(0,0,0,.6);border-radius:4px;padding:3px 6px">Slide ' + (i+1) + '</div>';
       } else {
-        thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">' + (liveSlides[i] ? 'Carregado' : 'Slide ' + (i+1)) + '</div>';
+        thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
       }
+
+      document.body.removeChild(stage);
     } catch(e) {
       console.warn('Thumb', i, 'error:', e);
       thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
+      try { document.body.removeChild(stage); } catch(x) {}
     }
   }
-
-  // Show all slides again (cleanup)
-  for (var j = 0; j < liveSlides.length; j++) {
-    if (liveSlides[j] && liveSlides[j].style) liveSlides[j].style.display = '';
-  }
-  document.body.removeChild(stage);
 }
 
 // ========== FORMAT / SCALE SELECTION ==========
@@ -732,7 +730,7 @@ document.getElementById('scaleRow').addEventListener('click', function(e) {
 });
 
 // ========== EDITOR ==========
-var E = { inited:false, canvas:null, els:[], sel:null, tool:'select', zoom:1, grid:false, snap:true, undoS:[], redoS:[], nextId:1, w:1080, h:1080, bg:'#ffffff', dragging:false, resizing:false, rHandle:null, dStart:{x:0,y:0}, eStart:{x:0,y:0,w:0,h:0} };
+var E = { inited:false, canvas:null, els:[], sel:null, tool:'select', zoom:1, grid:false, snap:true, undoS:[], redoS:[], nextId:1, w:1080, h:1080, bg:'#ffffff', bgImg:'', dragging:false, resizing:false, rHandle:null, dStart:{x:0,y:0}, eStart:{x:0,y:0,w:0,h:0} };
 
 function initEditor() {
   E.canvas = document.getElementById('edCanvas');
@@ -983,6 +981,22 @@ function edToggleGrid() { E.grid = !E.grid; edRender(); }
 function edResize() { E.w = parseInt(document.getElementById('edW').value)||1080; E.h = parseInt(document.getElementById('edH').value)||1080; E.canvas.style.width = E.w+'px'; E.canvas.style.height = E.h+'px'; }
 function showCtx(e) { var m = document.getElementById('ctx'); m.style.left = e.clientX+'px'; m.style.top = e.clientY+'px'; m.classList.add('show'); }
 function hideCtx() { document.getElementById('ctx').classList.remove('show'); }
+
+function setBgImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    E.bgImg = e.target.result;
+    E.canvas.style.backgroundImage = 'url(' + E.bgImg + ')';
+    E.canvas.style.backgroundSize = 'cover';
+    E.canvas.style.backgroundPosition = 'center';
+    E.canvas.style.backgroundRepeat = 'no-repeat';
+    toast('Imagem de fundo aplicada');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
 
 function addImage(src) {
   var img = new Image();
@@ -1350,7 +1364,22 @@ async function edExportCanvas(scale, fmt, qual) {
   var ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
   ctx.fillStyle = E.bg; ctx.fillRect(0, 0, E.w, E.h);
-  
+
+  // Draw background image if set
+  if (E.bgImg) {
+    var bgImgObj = await new Promise(function(r) {
+      var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = E.bgImg;
+    });
+    if (bgImgObj) {
+      var imgRatio = bgImgObj.naturalWidth / bgImgObj.naturalHeight;
+      var canvasRatio = E.w / E.h;
+      var dw, dh, dx, dy;
+      if (imgRatio > canvasRatio) { dh = E.h; dw = E.h * imgRatio; dx = (E.w - dw) / 2; dy = 0; }
+      else { dw = E.w; dh = E.w / imgRatio; dx = 0; dy = (E.h - dh) / 2; }
+      ctx.drawImage(bgImgObj, dx, dy, dw, dh);
+    }
+  }
+
   for (var i = 0; i < E.els.length; i++) {
     var el = E.els[i];
     if (!el.visible) continue;
