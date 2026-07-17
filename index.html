@@ -415,6 +415,12 @@ body.light .slide-thumb{background:#F0F0F0;border-color:#E0E0E4}
       <div class="ed-topbar">
         <button class="ed-tool" onclick="edToggleGrid()" title="Grade" style="width:28px;height:28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
         <div style="flex:1"></div>
+        <div id="slideNav" style="display:none;align-items:center;gap:8px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:6px;padding:2px 6px">
+          <button class="ed-tool" onclick="edPrevSlide()" style="width:24px;height:24px" title="Slide anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <span id="slideCounter" style="font-size:11px;font-weight:600;color:#A0A0A8;min-width:60px;text-align:center">1 / 1</span>
+          <button class="ed-tool" onclick="edNextSlide()" style="width:24px;height:24px" title="Proximo slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+        <div style="flex:1"></div>
         <button class="btn-secondary" style="width:auto;padding:4px 10px;font-size:11px" onclick="go(state.analysis?'analysis':'dash')">Voltar</button>
         <button class="btn-primary" style="width:auto;padding:4px 10px;font-size:11px" onclick="exportEditor()">Exportar</button>
       </div>
@@ -773,7 +779,7 @@ document.getElementById('scaleRow').addEventListener('click', function(e) {
 });
 
 // ========== EDITOR ==========
-var E = { inited:false, canvas:null, els:[], sel:null, tool:'select', zoom:1, grid:false, snap:true, undoS:[], redoS:[], nextId:1, w:1080, h:1080, bg:'#ffffff', bgImg:'', dragging:false, resizing:false, rHandle:null, dStart:{x:0,y:0}, eStart:{x:0,y:0,w:0,h:0} };
+var E = { inited:false, canvas:null, els:[], sel:null, tool:'select', zoom:1, grid:false, snap:true, undoS:[], redoS:[], nextId:1, w:1080, h:1080, bg:'#ffffff', bgImg:'', dragging:false, resizing:false, rHandle:null, dStart:{x:0,y:0}, eStart:{x:0,y:0,w:0,h:0}, slides:[], currentSlide:0 };
 
 function initEditor() {
   E.canvas = document.getElementById('edCanvas');
@@ -1309,143 +1315,272 @@ async function openEditor() {
   document.getElementById('edH').value = E.h;
   E.canvas.style.width = E.w + 'px';
   E.canvas.style.height = E.h + 'px';
-  E.els = [];
-  E.sel = null;
-  E.undoS = [];
-  E.redoS = [];
   E.bg = '#ffffff';
   E.canvas.style.background = '#ffffff';
   document.getElementById('edBg').value = '#ffffff';
+  E.slides = [];
+  E.currentSlide = 0;
 
-  toast('Carregando design...');
+  toast('Carregando todas as slides...');
 
-  // Render first slide as background image
+  // Render ALL slides as background images
   try {
+    var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
     // Create staging container
     var stage = document.createElement('div');
     stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
     document.body.appendChild(stage);
-
-    var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     stage.innerHTML = clean;
 
-    // Wait for render
     await new Promise(function(r) { setTimeout(r, 2500); });
-    stage.offsetHeight; // force layout
+    stage.offsetHeight;
 
-    // Find first slide
-    var slides = detectSlidesIn(stage);
-    var firstSlide = slides[0] || stage;
-    firstSlide.style.display = 'flex';
-    firstSlide.style.width = a.res.w + 'px';
-    firstSlide.style.height = a.res.h + 'px';
+    var liveSlides = detectSlidesIn(stage);
+    console.log('[Editor] Found', liveSlides.length, 'slides');
 
-    // Hide other slides
-    for (var i = 1; i < slides.length; i++) slides[i].style.display = 'none';
+    for (var i = 0; i < liveSlides.length; i++) {
+      // Hide all slides
+      for (var j = 0; j < liveSlides.length; j++) {
+        liveSlides[j].style.setProperty('display', 'none', 'important');
+      }
+      // Show only target
+      liveSlides[i].style.setProperty('display', 'flex', 'important');
+      liveSlides[i].style.width = a.res.w + 'px';
+      liveSlides[i].style.height = a.res.h + 'px';
+      void liveSlides[i].offsetHeight;
 
-    // Render to canvas with html2canvas
-    if (typeof html2canvas !== 'undefined') {
-      var canvas = await html2canvas(firstSlide, {
-        width: a.res.w, height: a.res.h, scale: 1,
-        useCORS: true, allowTaint: true,
-        backgroundColor: '#ffffff', logging: false
-      });
-      var imgEl = mkEl('image', 0, 0);
-      imgEl.w = a.res.w;
-      imgEl.h = a.res.h;
-      imgEl.src = canvas.toDataURL('image/png');
-      imgEl.locked = true;
-      E.els.push(imgEl);
+      var bgSrc = '';
+      if (typeof html2canvas !== 'undefined') {
+        try {
+          var canvas = await html2canvas(liveSlides[i], {
+            width: a.res.w, height: a.res.h, scale: 1,
+            useCORS: true, allowTaint: true,
+            backgroundColor: '#ffffff', logging: false
+          });
+          bgSrc = canvas.toDataURL('image/png');
+          console.log('[Editor] Slide', i+1, 'rendered');
+        } catch(e) { console.warn('[Editor] Slide', i+1, 'error:', e); }
+      }
+
+      E.slides.push({ bg: bgSrc, els: [], nextId: 1 });
+      toast('Slide ' + (i+1) + '/' + liveSlides.length + ' carregada');
     }
 
+    // Restore visibility
+    for (var j = 0; j < liveSlides.length; j++) {
+      liveSlides[j].style.removeProperty('display');
+    }
     document.body.removeChild(stage);
   } catch(e) {
-    console.warn('Preview error:', e);
+    console.warn('Editor load error:', e);
     try { document.body.removeChild(stage); } catch(x) {}
+    E.slides.push({ bg: '', els: [], nextId: 1 });
   }
+
+  // If no slides found, add a blank one
+  if (E.slides.length === 0) E.slides.push({ bg: '', els: [], nextId: 1 });
+
+  // Load first slide
+  edLoadSlide(0);
+
+  // Show/hide slide navigator
+  var nav = document.getElementById('slideNav');
+  if (E.slides.length > 1) {
+    nav.style.display = 'flex';
+    document.getElementById('slideCounter').textContent = '1 / ' + E.slides.length;
+  } else {
+    nav.style.display = 'none';
+  }
+
+  toast('Todas as ' + E.slides.length + ' slide(s) carregadas!');
+}
+
+function edLoadSlide(idx) {
+  // Save current slide state
+  if (E.slides[E.currentSlide]) {
+    E.slides[E.currentSlide].els = JSON.parse(JSON.stringify(E.els));
+    E.slides[E.currentSlide].nextId = E.nextId;
+  }
+
+  // Load new slide
+  E.currentSlide = idx;
+  var slide = E.slides[idx];
+  if (!slide) return;
+
+  E.els = JSON.parse(JSON.stringify(slide.els));
+  E.nextId = slide.nextId || 1;
+  E.sel = null;
+  E.undoS = [];
+  E.redoS = [];
+
+  // Set background
+  if (slide.bg) {
+    E.canvas.style.backgroundImage = 'url(' + slide.bg + ')';
+    E.canvas.style.backgroundSize = 'cover';
+    E.canvas.style.backgroundPosition = 'center';
+    E.canvas.style.backgroundRepeat = 'no-repeat';
+    E.bgImg = slide.bg;
+  } else {
+    E.canvas.style.backgroundImage = '';
+    E.bgImg = '';
+  }
+  E.canvas.style.background = E.bg;
+
+  // Update counter
+  document.getElementById('slideCounter').textContent = (idx + 1) + ' / ' + E.slides.length;
 
   edRender();
   edLayers();
-  toast('Design carregado - edite ou exporte');
+  edProps();
+}
+
+function edPrevSlide() {
+  if (E.currentSlide > 0) edLoadSlide(E.currentSlide - 1);
+}
+
+function edNextSlide() {
+  if (E.currentSlide < E.slides.length - 1) edLoadSlide(E.currentSlide + 1);
 }
 
 // Editor export
 async function exportEditor() {
   var fmt = getFmt(), scale = getScale(), qual = getQual();
+  var totalSlides = E.slides.length;
+
   go('progress');
   document.getElementById('p-name').textContent = 'Design do Editor';
   document.getElementById('p-scale').textContent = scale + 'x';
   document.getElementById('p-fmt').textContent = fmt.toUpperCase() + ' ' + (E.w*scale) + 'x' + (E.h*scale);
-  document.getElementById('p-detail').textContent = 'Renderizando...';
-  document.getElementById('pct').textContent = '50%';
-  document.getElementById('bar').style.width = '50%';
-  document.getElementById('sp-grid').innerHTML = '<div class="sp-item active"><div class="sp-dot"></div><div class="n">01</div></div>';
-  
+  document.getElementById('p-detail').textContent = 'Preparando...';
+  document.getElementById('pct').textContent = '0%';
+  document.getElementById('bar').style.width = '0%';
+  document.getElementById('p-slides').textContent = '0';
+
+  var sg = document.getElementById('sp-grid');
+  sg.innerHTML = '';
+  for (var i = 0; i < totalSlides; i++) sg.innerHTML += '<div class="sp-item" id="sp' + i + '"><div class="sp-dot"></div><div class="n">' + String(i+1).padStart(2,'0') + '</div></div>';
+
+  // Save current slide state
+  if (E.slides[E.currentSlide]) {
+    E.slides[E.currentSlide].els = JSON.parse(JSON.stringify(E.els));
+    E.slides[E.currentSlide].nextId = E.nextId;
+  }
+
+  state.imgs = [];
+  var t0 = Date.now();
+
   try {
-    var blob = await edExportCanvas(scale, fmt, qual);
-    state.imgs = [{name:'design.' + fmt, blob:blob, idx:0}];
-    state.totalSlides++; state.totalFiles++;
-    state.hist.unshift({name:'Editor', slides:1, fmt:fmt.toUpperCase(), scale:scale+'x', date:new Date().toLocaleString('pt-BR')});
+    for (var i = 0; i < totalSlides; i++) {
+      var sp = document.getElementById('sp' + i);
+      if (sp) sp.classList.add('active');
+      document.getElementById('p-detail').textContent = 'Renderizando slide ' + (i+1) + ' de ' + totalSlides + '...';
+
+      var blob = await edExportSlide(i, scale, fmt, qual);
+      state.imgs.push({name:'Slide-' + String(i+1).padStart(2,'0') + '.' + fmt, blob:blob, idx:i});
+
+      if (sp) { sp.classList.remove('active'); sp.classList.add('done'); }
+      document.getElementById('p-slides').textContent = i+1;
+      var pct = Math.round(((i+1)/totalSlides)*100);
+      document.getElementById('pct').textContent = pct + '%';
+      document.getElementById('bar').style.width = pct + '%';
+    }
+
+    // Generate PDF/PPTX if needed
+    if (fmt === 'pdf' && typeof jspdf !== 'undefined' && state.imgs.length > 0) {
+      var pw = E.w * scale * 0.75, ph = E.h * scale * 0.75;
+      var orient = E.w >= E.h ? 'landscape' : 'portrait';
+      var pdf = new jspdf.jsPDF({orientation:orient, unit:'pt', format:[pw,ph]});
+      for (var i = 0; i < state.imgs.length; i++) {
+        if (i > 0) pdf.addPage();
+        var du = await blobToDataUrl(state.imgs[i].blob);
+        pdf.addImage(du, 'PNG', 0, 0, pw, ph);
+      }
+      state.pdf = pdf.output('blob');
+    }
+    if ((fmt === 'pptx' || fmt === 'canva') && typeof PptxGenJS !== 'undefined' && state.imgs.length > 0) {
+      var pptx = new PptxGenJS();
+      pptx.defineLayout({name:'C', width:E.w/96, height:E.h/96});
+      pptx.layout = 'C';
+      for (var i = 0; i < state.imgs.length; i++) {
+        var sl = pptx.addSlide();
+        var du = await blobToDataUrl(state.imgs[i].blob);
+        sl.addImage({data:du, x:0, y:0, w:E.w/96, h:E.h/96});
+      }
+      state.pptx = await pptx.write({outputType:'blob'});
+    }
+
+    state.totalSlides += totalSlides; state.totalFiles++;
+    state.hist.unshift({name:'Editor', slides:totalSlides, fmt:fmt.toUpperCase(), scale:scale+'x', date:new Date().toLocaleString('pt-BR')});
     saveStats(); updateDash(); renderComplete();
     go('complete');
-    toast('Exportado!');
+    toast('Exportado! ' + totalSlides + ' slide(s)');
   } catch(e) { console.error(e); toast('Erro na exportacao', 'err'); go('editor'); }
 }
 
-async function edExportCanvas(scale, fmt, qual) {
+async function edExportSlide(slideIdx, scale, fmt, qual) {
+  var slide = E.slides[slideIdx];
+  if (!slide) throw new Error('Slide not found');
+
   var imageCache = {};
-  for (var i = 0; i < E.els.length; i++) {
-    var el = E.els[i];
+
+  // Cache background image
+  if (slide.bg) {
+    imageCache[slide.bg] = await new Promise(function(r) {
+      var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = slide.bg;
+    });
+  }
+
+  // Cache element images
+  for (var i = 0; i < slide.els.length; i++) {
+    var el = slide.els[i];
     if (el.type === 'image' && el.src && !imageCache[el.src]) {
-      imageCache[el.src] = await new Promise(function(resolve) {
-        var img = new Image(); img.onload = function() { resolve(img); }; img.onerror = function() { resolve(null); }; img.src = el.src;
+      imageCache[el.src] = await new Promise(function(r) {
+        var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = el.src;
       });
     }
   }
+
   var canvas = document.createElement('canvas');
   canvas.width = E.w * scale; canvas.height = E.h * scale;
   var ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
   ctx.fillStyle = E.bg; ctx.fillRect(0, 0, E.w, E.h);
 
-  // Draw background image if set
-  if (E.bgImg) {
-    var bgImgObj = await new Promise(function(r) {
-      var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = E.bgImg;
-    });
-    if (bgImgObj) {
-      var imgRatio = bgImgObj.naturalWidth / bgImgObj.naturalHeight;
-      var canvasRatio = E.w / E.h;
-      var dw, dh, dx, dy;
-      if (imgRatio > canvasRatio) { dh = E.h; dw = E.h * imgRatio; dx = (E.w - dw) / 2; dy = 0; }
-      else { dw = E.w; dh = E.w / imgRatio; dx = 0; dy = (E.h - dh) / 2; }
-      ctx.drawImage(bgImgObj, dx, dy, dw, dh);
-    }
+  // Draw background image
+  if (slide.bg && imageCache[slide.bg]) {
+    var bgImg = imageCache[slide.bg];
+    var imgRatio = bgImg.naturalWidth / bgImg.naturalHeight;
+    var canvasRatio = E.w / E.h;
+    var dw, dh, dx, dy;
+    if (imgRatio > canvasRatio) { dh = E.h; dw = E.h * imgRatio; dx = (E.w - dw) / 2; dy = 0; }
+    else { dw = E.w; dh = E.w / imgRatio; dx = 0; dy = (E.h - dh) / 2; }
+    ctx.drawImage(bgImg, dx, dy, dw, dh);
   }
 
-  for (var i = 0; i < E.els.length; i++) {
-    var el = E.els[i];
+  // Draw elements
+  for (var i = 0; i < slide.els.length; i++) {
+    var el = slide.els[i];
     if (!el.visible) continue;
     ctx.save();
     ctx.globalAlpha = el.opacity;
     ctx.translate(el.x + el.w/2, el.y + el.h/2);
     ctx.rotate(el.rot * Math.PI / 180);
     ctx.translate(-el.w/2, -el.h/2);
-    
+
     if (el.type === 'text') {
       ctx.font = el.fontWeight + ' ' + el.fontSize + 'px ' + el.fontFamily;
       ctx.fillStyle = el.color; ctx.textAlign = el.align; ctx.textBaseline = 'middle';
       var tx = el.align === 'center' ? el.w/2 : el.align === 'right' ? el.w : 0;
-      var lines = el.text.split('\n');
-      var lh = el.fontSize * 1.4;
-      lines.forEach(function(line, j) { ctx.fillText(line, tx, el.h/2 + (j - (lines.length-1)/2) * lh); });
+      var lines = el.text.split('\n'); var lh = el.fontSize * 1.4;
+      lines.forEach(function(line, j) { ctx.fillText(line, tx, el.h/2 + (j-(lines.length-1)/2)*lh); });
     } else if (el.type === 'rect') {
       ctx.fillStyle = el.fill;
       if (el.radius > 0) { ctx.beginPath(); ctx.moveTo(el.radius,0); ctx.lineTo(el.w-el.radius,0); ctx.quadraticCurveTo(el.w,0,el.w,el.radius); ctx.lineTo(el.w,el.h-el.radius); ctx.quadraticCurveTo(el.w,el.h,el.w-el.radius,el.h); ctx.lineTo(el.radius,el.h); ctx.quadraticCurveTo(0,el.h,0,el.h-el.radius); ctx.lineTo(0,el.radius); ctx.quadraticCurveTo(0,0,el.radius,0); ctx.closePath(); ctx.fill(); }
       else ctx.fillRect(0,0,el.w,el.h);
       if (el.strokeWidth > 0) { ctx.strokeStyle = el.stroke; ctx.lineWidth = el.strokeWidth; ctx.stroke(); }
     } else if (el.type === 'circle') {
-      ctx.beginPath(); ctx.ellipse(el.w/2, el.h/2, el.w/2, el.h/2, 0, 0, Math.PI*2);
+      ctx.beginPath(); ctx.ellipse(el.w/2,el.h/2,el.w/2,el.h/2,0,0,Math.PI*2);
       ctx.fillStyle = el.fill; ctx.fill();
       if (el.strokeWidth > 0) { ctx.strokeStyle = el.stroke; ctx.lineWidth = el.strokeWidth; ctx.stroke(); }
     } else if (el.type === 'image' && el.src && imageCache[el.src]) {
@@ -1453,6 +1588,7 @@ async function edExportCanvas(scale, fmt, qual) {
     }
     ctx.restore();
   }
+
   var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
   return new Promise(function(r) { canvas.toBlob(function(b) { r(b); }, mime, qual); });
 }
