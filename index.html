@@ -349,7 +349,7 @@
     .toast.error { border-color:var(--danger); } .toast.error .toast-icon { color:var(--danger); }
     .toast.warning { border-color:var(--warning); } .toast.warning .toast-icon { color:var(--warning); }
     .toast-icon { width:20px; height:20px; flex-shrink:0; }
-    .file-input-hidden { display:none; }
+    .file-input-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
 
     /* MOBILE NAV */
     .mobile-nav { display:none; position:fixed; bottom:0; left:0; right:0; height:56px; background:var(--bg-elevated); border-top:1px solid var(--border-subtle); z-index:100; padding:0 8px; align-items:center; justify-content:space-around; }
@@ -519,7 +519,7 @@
               <div class="drop-zone-title">Arraste seu arquivo HTML aqui</div>
               <div class="drop-zone-subtitle">Solte o arquivo do carrossel produzido por qualquer ferramenta de design</div>
               <div class="drop-zone-or">ou</div>
-              <button class="btn btn-primary btn-lg" onclick="document.getElementById('fileInput').click()">
+              <button class="btn btn-primary btn-lg" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                 Selecionar Arquivo
               </button>
@@ -738,7 +738,7 @@
               <div class="drop-zone-title">Arraste multiplos arquivos HTML</div>
               <div class="drop-zone-subtitle">Ou selecione varios arquivos de uma vez</div>
               <div class="drop-zone-or">ou</div>
-              <button class="btn btn-primary" onclick="document.getElementById('batchFileInput').click()">Selecionar Arquivos</button>
+              <button class="btn btn-primary" onclick="event.stopPropagation();document.getElementById('batchFileInput').click()">Selecionar Arquivos</button>
             </div>
             <input type="file" id="batchFileInput" class="file-input-hidden" accept=".html,.htm" multiple />
             <div id="batchFilesList" style="display:none">
@@ -1362,18 +1362,26 @@
       },
 
       showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById('screen-' + screenId);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-          item.classList.remove('active');
-          if (item.dataset.screen === screenId) item.classList.add('active');
-        });
-        document.querySelectorAll('.mobile-nav-item').forEach(item => {
-          item.classList.remove('active');
-          if (item.dataset.screen === screenId) item.classList.add('active');
-        });
-        if (screenId === 'editor' && !Editor.canvas) Editor.init();
+        try {
+          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+          const target = document.getElementById('screen-' + screenId);
+          if (target) target.classList.add('active');
+          document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.screen === screenId) item.classList.add('active');
+          });
+          document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.screen === screenId) item.classList.add('active');
+          });
+          if (screenId === 'editor') {
+            try {
+              if (!Editor.canvas || !document.getElementById('editorCanvas')) Editor.init();
+            } catch (e) { console.warn('Editor init error:', e); }
+          }
+        } catch (err) {
+          console.error('showScreen error:', err);
+        }
       },
 
       selectFormat(el) { el.parentElement.querySelectorAll('.format-pill').forEach(p => p.classList.remove('selected')); el.classList.add('selected'); this.state.exportFormat = el.dataset.format; },
@@ -1441,112 +1449,162 @@
 
       // HTML Analysis
       analyzeHTML(htmlContent, fileName) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
-        const slides = this.detectSlides(doc);
-        const resolution = this.detectResolution(doc, slides);
-        const fonts = this.detectFonts(doc);
-        const images = this.detectImages(doc);
-        return {
-          fileName, slideCount: slides.length, slides, resolution,
-          orientation: resolution.w === resolution.h ? 'Quadrado (1:1)' : resolution.w > resolution.h ? 'Paisagem' : 'Retrato',
-          fonts, imageCount: images.length, svgCount: doc.querySelectorAll('svg').length,
-          hasJS: doc.querySelectorAll('script').length > 0,
-          gradients: this.countPatterns(doc, 'gradient'), blurs: this.countPatterns(doc, 'blur('),
-          htmlContent
-        };
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+          if (!doc || !doc.body) throw new Error('Nao foi possivel parsear o HTML');
+          const slides = this.detectSlides(doc);
+          const resolution = this.detectResolution(doc, slides);
+          const fonts = this.detectFonts(doc);
+          const images = this.detectImages(doc);
+          return {
+            fileName, slideCount: slides.length, slides, resolution,
+            orientation: resolution.w === resolution.h ? 'Quadrado (1:1)' : resolution.w > resolution.h ? 'Paisagem' : 'Retrato',
+            fonts, imageCount: images.length, svgCount: (doc.querySelectorAll('svg') || []).length,
+            hasJS: (doc.querySelectorAll('script') || []).length > 0,
+            gradients: this.countPatterns(doc, 'gradient'), blurs: this.countPatterns(doc, 'blur('),
+            htmlContent
+          };
+        } catch (err) {
+          console.error('analyzeHTML error:', err);
+          // Return a minimal valid analysis so the app doesn't break
+          return {
+            fileName, slideCount: 1, slides: [document.createElement('div')], resolution: { w: 1080, h: 1080 },
+            orientation: 'Quadrado (1:1)', fonts: [], imageCount: 0, svgCount: 0,
+            hasJS: false, gradients: 0, blurs: 0, htmlContent
+          };
+        }
       },
 
       detectSlides(doc) {
+        if (!doc || !doc.body) return [document.createElement('div')];
         // Try common slide selectors
         const selectors = [
           '.slide', 'section[data-screen-label]', '.deck-stage > section',
           '[class*="slide"]', '[class*="Slide"]', '[data-slide]',
           '.carousel-item', '.swiper-slide', '.splide__slide',
-          '[class*="carousel"] > div', '[class*="swiper"] > div'
+          '[class*="carousel"] > div', '[class*="swiper"] > div',
+          '.page', '[class*="page"]', '.card', '[class*="card"]'
         ];
         for (const sel of selectors) {
           try {
             const s = doc.querySelectorAll(sel);
-            if (s.length > 0) return Array.from(s);
+            if (s && s.length > 0) return Array.from(s);
           } catch (e) { /* ignore invalid selectors */ }
         }
         // Try containers with multiple sections
-        for (const c of doc.querySelectorAll('.deck-stage, .carousel, .slideshow, main, .container, .wrapper, [class*="deck"], [class*="presentation"]')) {
-          const s = c.querySelectorAll(':scope > section, :scope > div[class], :scope > article');
-          if (s.length > 1) return Array.from(s);
-        }
+        try {
+          for (const c of doc.querySelectorAll('.deck-stage, .carousel, .slideshow, main, .container, .wrapper, [class*="deck"], [class*="presentation"]')) {
+            const s = c.querySelectorAll(':scope > section, :scope > div[class], :scope > article');
+            if (s && s.length > 1) return Array.from(s);
+          }
+        } catch (e) { /* ignore */ }
         // Fallback: multiple sections
-        const s = doc.querySelectorAll('section');
-        if (s.length > 1) return Array.from(s);
+        try {
+          const s = doc.querySelectorAll('section');
+          if (s && s.length > 1) return Array.from(s);
+        } catch (e) { /* ignore */ }
         // Fallback: multiple articles
-        const articles = doc.querySelectorAll('article');
-        if (articles.length > 1) return Array.from(articles);
+        try {
+          const articles = doc.querySelectorAll('article');
+          if (articles && articles.length > 1) return Array.from(articles);
+        } catch (e) { /* ignore */ }
+        // Fallback: multiple divs with significant content
+        try {
+          const bodyChildren = doc.body.children;
+          if (bodyChildren.length > 1) {
+            const divs = Array.from(bodyChildren).filter(el => el.tagName === 'DIV' || el.tagName === 'SECTION');
+            if (divs.length > 1) return divs;
+          }
+        } catch (e) { /* ignore */ }
         // Last resort: body as single slide
         return [doc.body];
       },
 
       detectResolution(doc, slides) {
-        // Check deck-stage
-        const stage = doc.querySelector('.deck-stage, [class*="deck-stage"], [class*="presentation"]');
-        if (stage) {
-          const style = stage.getAttribute('style') || '';
-          const w = style.match(/width:\s*(\d+)px/); const h = style.match(/height:\s*(\d+)px/);
-          if (w && h) return { w: parseInt(w[1]), h: parseInt(h[1]) };
-        }
-        // Check first slide dimensions
-        if (slides.length > 0 && slides[0] !== doc.body) {
-          const style = slides[0].getAttribute('style') || '';
-          const w = style.match(/width:\s*(\d+)px/); const h = style.match(/height:\s*(\d+)px/);
-          if (w && h) return { w: parseInt(w[1]), h: parseInt(h[1]) };
-          // Check CSS classes for dimensions
-          const cls = slides[0].className || '';
-          const wCls = cls.match(/w-(\d+)/); const hCls = cls.match(/h-(\d+)/);
-        }
-        // Check viewport meta
-        const viewport = doc.querySelector('meta[name="viewport"]');
-        // Default
+        try {
+          // Check deck-stage
+          const stage = doc.querySelector('.deck-stage, [class*="deck-stage"], [class*="presentation"]');
+          if (stage) {
+            const style = stage.getAttribute('style') || '';
+            const w = style.match(/width:\s*(\d+)px/); const h = style.match(/height:\s*(\d+)px/);
+            if (w && h) return { w: parseInt(w[1]), h: parseInt(h[1]) };
+          }
+          // Check first slide dimensions
+          if (slides && slides.length > 0 && slides[0] && slides[0] !== doc.body) {
+            const style = (slides[0].getAttribute && slides[0].getAttribute('style')) || '';
+            const w = style.match(/width:\s*(\d+)px/); const h = style.match(/height:\s*(\d+)px/);
+            if (w && h) return { w: parseInt(w[1]), h: parseInt(h[1]) };
+          }
+        } catch (e) { /* ignore */ }
         return { w: 1080, h: 1080 };
       },
 
       detectFonts(doc) {
         const fonts = new Set();
-        doc.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(l => {
-          (l.getAttribute('href') || '').match(/family=([^&:]+)/g)?.forEach(f => fonts.add(f.replace('family=', '').replace(/\+/g, ' ')));
-        });
-        // Also check inline styles for font-family
-        doc.querySelectorAll('[style*="font-family"]').forEach(el => {
-          const match = (el.getAttribute('style') || '').match(/font-family:\s*([^;]+)/);
-          if (match) fonts.add(match[1].trim().replace(/['"]/g, ''));
-        });
+        try {
+          doc.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(l => {
+            (l.getAttribute('href') || '').match(/family=([^&:]+)/g)?.forEach(f => fonts.add(f.replace('family=', '').replace(/\+/g, ' ')));
+          });
+          doc.querySelectorAll('[style*="font-family"]').forEach(el => {
+            const match = (el.getAttribute('style') || '').match(/font-family:\s*([^;]+)/);
+            if (match) fonts.add(match[1].trim().replace(/['"]/g, ''));
+          });
+        } catch (e) { /* ignore */ }
         return Array.from(fonts);
       },
 
-      detectImages(doc) { return doc.querySelectorAll('img, [style*="background-image"], svg'); },
-      countPatterns(doc, pattern) { let c = 0; doc.querySelectorAll('style').forEach(s => { const m = s.textContent.match(new RegExp(pattern, 'gi')); if (m) c += m.length; }); return c; },
+      detectImages(doc) { try { return doc.querySelectorAll('img, [style*="background-image"], svg') || []; } catch (e) { return []; } },
+      countPatterns(doc, pattern) { let c = 0; try { doc.querySelectorAll('style').forEach(s => { const m = s.textContent.match(new RegExp(pattern, 'gi')); if (m) c += m.length; }); } catch (e) {} return c; },
 
       handleFile(file) {
-        if (!file || !file.name.match(/\.html?$/i)) { this.showToast('Selecione um arquivo HTML valido', 'error'); return; }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.state.currentFile = e.target.result;
-          this.state.currentFileName = file.name;
-          this.state.analysis = this.analyzeHTML(e.target.result, file.name);
-          this.renderAnalysis();
-          this.showScreen('analysis');
-          this.showToast('Arquivo analisado com sucesso');
-        };
-        reader.readAsText(file);
+        try {
+          if (!file) { this.showToast('Nenhum arquivo selecionado', 'error'); return; }
+          if (!file.name.match(/\.html?$/i)) { this.showToast('Selecione um arquivo HTML ou HTM valido', 'error'); return; }
+          this.showToast('Lendo arquivo...');
+          const reader = new FileReader();
+          reader.onerror = () => { this.showToast('Erro ao ler o arquivo', 'error'); };
+          reader.onload = (e) => {
+            try {
+              const html = e.target.result;
+              if (!html || html.length < 10) { this.showToast('Arquivo vazio ou muito pequeno', 'error'); return; }
+              this.state.currentFile = html;
+              this.state.currentFileName = file.name;
+              this.state.analysis = this.analyzeHTML(html, file.name);
+              if (!this.state.analysis || this.state.analysis.slideCount === 0) { this.showToast('Nenhum slide detectado no arquivo', 'warning'); }
+              this.renderAnalysis();
+              this.showScreen('analysis');
+              this.showToast('Arquivo analisado com sucesso');
+            } catch (err) {
+              console.error('Erro ao analisar HTML:', err);
+              this.showToast('Erro ao processar o HTML: ' + err.message, 'error');
+            }
+          };
+          reader.readAsText(file);
+        } catch (err) {
+          console.error('Erro no handleFile:', err);
+          this.showToast('Erro inesperado: ' + err.message, 'error');
+        }
       },
 
       renderAnalysis() {
-        const a = this.state.analysis; if (!a) return;
-        document.getElementById('analysisFileName').textContent = a.fileName;
+        const a = this.state.analysis;
+        if (!a) {
+          this.showToast('Nenhum dado de analise disponivel', 'error');
+          return;
+        }
+        document.getElementById('analysisFileName').textContent = a.fileName || 'Arquivo';
         document.getElementById('slideCount').textContent = a.slideCount;
         const grid = document.getElementById('slideGrid');
         grid.innerHTML = '';
         for (let i = 0; i < a.slideCount; i++) {
-          const label = a.slides[i]?.getAttribute?.('data-screen-label') || 'Slide ' + (i + 1);
+          const slide = a.slides[i];
+          let label = 'Slide ' + (i + 1);
+          try {
+            if (slide && typeof slide.getAttribute === 'function') {
+              label = slide.getAttribute('data-screen-label') || slide.getAttribute('data-label') || label;
+            }
+          } catch (e) { /* ignore */ }
           grid.innerHTML += `<div class="slide-thumb"><div class="slide-thumb-number">${String(i + 1).padStart(2, '0')}</div><div class="slide-thumb-label">${label}</div></div>`;
         }
         // Update scale labels with actual resolution
@@ -1956,41 +2014,114 @@
       saveStats() { try { localStorage.setItem('vetbrainx-stats', JSON.stringify({ totalSlidesExported: this.state.totalSlidesExported, totalFilesProcessed: this.state.totalFilesProcessed, history: this.state.history.slice(0, 50) })); } catch (e) {} },
 
       init() {
-        this.initTheme();
-        this.loadStats();
-        document.getElementById('fileInput').addEventListener('change', e => { if (e.target.files[0]) this.handleFile(e.target.files[0]); e.target.value = ''; });
-        document.getElementById('batchFileInput').addEventListener('change', e => { if (e.target.files.length > 0) this.handleBatchFiles(e.target.files); e.target.value = ''; });
-        document.getElementById('imageInput').addEventListener('change', e => { if (e.target.files[0]) { const reader = new FileReader(); reader.onload = ev => Editor.addImage(ev.target.result); reader.readAsDataURL(e.target.files[0]); } e.target.value = ''; });
+        try {
+          this.initTheme();
+          this.loadStats();
 
-        // Paste area character count
-        const pasteArea = document.getElementById('htmlPasteArea');
-        if (pasteArea) {
-          pasteArea.addEventListener('input', () => this.updatePasteCharCount());
-          // Handle Ctrl+V paste detection
-          pasteArea.addEventListener('paste', () => {
-            setTimeout(() => this.updatePasteCharCount(), 100);
+          // File input - main upload
+          const fileInput = document.getElementById('fileInput');
+          if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) this.handleFile(file);
+              e.target.value = '';
+            });
+          }
+
+          // Batch file input
+          const batchInput = document.getElementById('batchFileInput');
+          if (batchInput) {
+            batchInput.addEventListener('change', (e) => {
+              if (e.target.files && e.target.files.length > 0) this.handleBatchFiles(e.target.files);
+              e.target.value = '';
+            });
+          }
+
+          // Image input (editor)
+          const imageInput = document.getElementById('imageInput');
+          if (imageInput) {
+            imageInput.addEventListener('change', (e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = ev => Editor.addImage(ev.target.result);
+                reader.readAsDataURL(file);
+              }
+              e.target.value = '';
+            });
+          }
+
+          // Paste area character count
+          const pasteArea = document.getElementById('htmlPasteArea');
+          if (pasteArea) {
+            pasteArea.addEventListener('input', () => this.updatePasteCharCount());
+            pasteArea.addEventListener('paste', () => {
+              setTimeout(() => this.updatePasteCharCount(), 100);
+            });
+          }
+
+          // Drop zone - upload
+          const dropZone = document.getElementById('dropZone');
+          if (dropZone) {
+            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', e => {
+              e.preventDefault();
+              dropZone.classList.remove('drag-over');
+              const file = e.dataTransfer.files && e.dataTransfer.files[0];
+              if (file) this.handleFile(file);
+            });
+            // Use a flag to prevent double-trigger when button is clicked
+            let fileDialogOpen = false;
+            dropZone.addEventListener('click', (e) => {
+              // If the click target is a button or inside a button, let the button handle it
+              if (e.target.closest('button') || e.target.closest('.btn')) return;
+              if (fileDialogOpen) return;
+              fileDialogOpen = true;
+              fileInput.click();
+              // Reset flag after dialog closes (or after timeout)
+              setTimeout(() => { fileDialogOpen = false; }, 1000);
+            });
+          }
+
+          // Batch drop zone
+          const batchDrop = document.getElementById('batchDropZone');
+          if (batchDrop) {
+            batchDrop.addEventListener('dragover', e => { e.preventDefault(); batchDrop.classList.add('drag-over'); });
+            batchDrop.addEventListener('dragleave', () => batchDrop.classList.remove('drag-over'));
+            batchDrop.addEventListener('drop', e => {
+              e.preventDefault();
+              batchDrop.classList.remove('drag-over');
+              if (e.dataTransfer.files.length > 0) this.handleBatchFiles(e.dataTransfer.files);
+            });
+            let batchDialogOpen = false;
+            batchDrop.addEventListener('click', (e) => {
+              if (e.target.closest('button') || e.target.closest('.btn')) return;
+              if (batchDialogOpen) return;
+              batchDialogOpen = true;
+              batchInput.click();
+              setTimeout(() => { batchDialogOpen = false; }, 1000);
+            });
+          }
+
+          // Theme change listener
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            try { if (!localStorage.getItem('vetbrainx-theme')) document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); } catch (err) {}
           });
+
+          console.log('[VetBrainX Export] App inicializado com sucesso');
+        } catch (err) {
+          console.error('[VetBrainX Export] Erro na inicializacao:', err);
         }
-
-        const dropZone = document.getElementById('dropZone');
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) this.handleFile(e.dataTransfer.files[0]); });
-        dropZone.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON') document.getElementById('fileInput').click(); });
-
-        const batchDrop = document.getElementById('batchDropZone');
-        batchDrop.addEventListener('dragover', e => { e.preventDefault(); batchDrop.classList.add('drag-over'); });
-        batchDrop.addEventListener('dragleave', () => batchDrop.classList.remove('drag-over'));
-        batchDrop.addEventListener('drop', e => { e.preventDefault(); batchDrop.classList.remove('drag-over'); if (e.dataTransfer.files.length > 0) this.handleBatchFiles(e.dataTransfer.files); });
-        batchDrop.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON') document.getElementById('batchFileInput').click(); });
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-          try { if (!localStorage.getItem('vetbrainx-theme')) document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); } catch (err) {}
-        });
       }
     };
 
-    App.init();
+    // Wait for DOM then init
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => App.init());
+    } else {
+      App.init();
+    }
   </script>
 </body>
 </html>
