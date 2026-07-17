@@ -943,46 +943,52 @@ async function doExport() {
   if (!a) { toast('Nenhum arquivo analisado', 'err'); return; }
   if (state.exporting) return;
   state.exporting = true; state.cancel = false; state.imgs = []; state.pdf = null; state.pptx = null;
-  
+
   var fmt = getFmt(), scale = getScale(), qual = getQual();
-  
+
   document.getElementById('p-name').textContent = a.name;
   document.getElementById('p-scale').textContent = scale + 'x';
   document.getElementById('p-fmt').textContent = fmt.toUpperCase() + ' ' + (a.res.w*scale) + 'x' + (a.res.h*scale);
   document.getElementById('pct').textContent = '0%';
   document.getElementById('bar').style.width = '0%';
   document.getElementById('p-detail').textContent = 'Preparando...';
-  
+
   var sg = document.getElementById('sp-grid');
   sg.innerHTML = '';
   for (var i = 0; i < a.count; i++) sg.innerHTML += '<div class="sp-item" id="sp' + i + '"><div class="sp-dot"></div><div class="n">' + String(i+1).padStart(2,'0') + '</div></div>';
-  
+
   go('progress');
   var t0 = Date.now();
-  
-  // Create iframe
-  var iframe = document.createElement('iframe');
-  iframe.style.cssText = 'position:fixed;left:-9999px;top:-9999px;border:none;width:' + a.res.w + 'px;height:' + a.res.h + 'px;';
-  document.body.appendChild(iframe);
-  
+
+  // Render slides using a visible staging container (not iframe)
+  var container = document.createElement('div');
+  container.id = 'export-stage';
+  container.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
+  document.body.appendChild(container);
+
+  // Strip scripts and inject HTML
   var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  var idoc = iframe.contentDocument || iframe.contentWindow.document;
-  idoc.open(); idoc.write(clean); idoc.close();
-  
-  document.getElementById('p-detail').textContent = 'Carregando...';
-  await new Promise(function(r) {
-    if (idoc.readyState === 'complete') setTimeout(r, 2000);
-    else iframe.contentWindow.addEventListener('load', function() { setTimeout(r, 2000); });
-  });
-  
+  container.innerHTML = clean;
+
+  // Wait for rendering
+  document.getElementById('p-detail').textContent = 'Carregando conteudo...';
+  await new Promise(function(r) { setTimeout(r, 2500); });
+
+  // Force layout
+  container.offsetHeight;
+
+  // Find slides INSIDE the container (re-query with same selectors)
+  var liveSlides = detectSlidesIn(container);
+
   for (var i = 0; i < a.count; i++) {
     if (state.cancel) break;
     var sp = document.getElementById('sp' + i);
     if (sp) sp.classList.add('active');
-    document.getElementById('p-detail').textContent = 'Slide ' + (i+1) + ' de ' + a.count + '...';
-    
+    document.getElementById('p-detail').textContent = 'Renderizando slide ' + (i+1) + ' de ' + a.count + '...';
+
     try {
-      var blob = await renderSlide(iframe, a.slides[i], a.res, scale, fmt, qual);
+      var slideEl = liveSlides[i] || container;
+      var blob = await renderSlideEl(slideEl, a.res, scale, fmt, qual);
       state.imgs.push({name:'Slide-' + String(i+1).padStart(2,'0') + '.' + fmt, blob:blob, idx:i});
       if (sp) { sp.classList.remove('active'); sp.classList.add('done'); }
       document.getElementById('p-slides').textContent = i+1;
@@ -992,11 +998,12 @@ async function doExport() {
       var elapsed = Date.now() - t0;
       var rem = Math.round((elapsed/(i+1) * (a.count-i-1))/1000);
       document.getElementById('p-time').textContent = String(Math.floor(rem/60)).padStart(2,'0') + ':' + String(rem%60).padStart(2,'0');
-    } catch(err) { console.error('Slide', i, err); if (sp) { sp.classList.remove('active'); sp.classList.add('done'); } }
+    } catch(err) { console.error('Slide', i, 'error:', err); if (sp) { sp.classList.remove('active'); sp.classList.add('done'); } }
   }
-  
-  document.body.removeChild(iframe);
-  
+
+  // Cleanup staging container
+  document.body.removeChild(container);
+
   if (!state.cancel && state.imgs.length > 0) {
     // PDF
     if (fmt === 'pdf' && typeof jspdf !== 'undefined') {
@@ -1026,67 +1033,116 @@ async function doExport() {
         state.pptx = await pptx.write({outputType:'blob'});
       } catch(e) { console.error('PPTX error:', e); }
     }
-    
+
     state.totalSlides += a.count; state.totalFiles++;
     state.hist.unshift({name:a.name, slides:a.count, fmt:fmt.toUpperCase(), scale:scale+'x', date:new Date().toLocaleString('pt-BR')});
     saveStats(); updateDash(); renderComplete();
     go('complete');
-    toast('Exportacao concluida!');
+    toast('Exportacao concluida! ' + state.imgs.length + ' slide(s)');
   } else if (state.imgs.length === 0) {
-    toast('Nenhum slide exportado', 'err');
+    toast('Nenhum slide exportado - tente outro arquivo', 'err');
     go('analysis');
   }
   state.exporting = false;
 }
 
-async function renderSlide(iframe, slide, res, scale, fmt, qual) {
-  var idoc = iframe.contentDocument || iframe.contentWindow.document;
-  idoc.querySelectorAll('.slide,[data-screen-label],.deck-stage > section,[class*="slide"]').forEach(function(s) { s.style.display = 'none'; });
-  if (slide && slide.style) { slide.style.display = 'flex'; slide.style.width = res.w+'px'; slide.style.height = res.h+'px'; }
-  idoc.querySelectorAll('.deck-counter,.deck-hint,nav,[class*="navigation"],[class*="controls"]').forEach(function(el) { el.style.display = 'none'; });
-  var stage = idoc.querySelector('.deck-stage');
-  if (stage) { stage.style.transform = 'none'; stage.style.width = res.w+'px'; stage.style.height = res.h+'px'; }
-  
+function detectSlidesIn(container) {
+  var sels = ['.slide','[data-screen-label]','.deck-stage > section','[class*="slide"]',
+    '[class*="Slide"]','[data-slide]','.carousel-item','.swiper-slide','.page','[class*="page"]'];
+  for (var i = 0; i < sels.length; i++) {
+    try { var s = container.querySelectorAll(sels[i]); if (s.length > 0) return Array.from(s); } catch(e) {}
+  }
+  try {
+    var sec = container.querySelectorAll('section');
+    if (sec.length > 1) return Array.from(sec);
+  } catch(e) {}
+  try {
+    var arts = container.querySelectorAll('article');
+    if (arts.length > 1) return Array.from(arts);
+  } catch(e) {}
+  // Fallback: direct children
+  var kids = [];
+  for (var i = 0; i < container.children.length; i++) {
+    var ch = container.children[i];
+    if (ch.tagName === 'DIV' || ch.tagName === 'SECTION' || ch.tagName === 'ARTICLE') kids.push(ch);
+  }
+  if (kids.length > 1) return kids;
+  return [container];
+}
+
+async function renderSlideEl(el, res, scale, fmt, qual) {
+  // Prepare element for capture
+  el.style.display = 'flex';
+  el.style.width = res.w + 'px';
+  el.style.height = res.h + 'px';
+  el.style.position = 'relative';
+  el.style.overflow = 'hidden';
+
+  // Hide sibling slides
+  var parent = el.parentElement;
+  if (parent) {
+    for (var i = 0; i < parent.children.length; i++) {
+      if (parent.children[i] !== el) parent.children[i].style.display = 'none';
+    }
+  }
+
+  // Force reflow
+  el.offsetHeight;
+
+  // Method 1: html2canvas
   if (typeof html2canvas !== 'undefined') {
     try {
-      var canvas = await html2canvas(slide || idoc.body, {width:res.w, height:res.h, scale:scale, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false, removeContainer:true});
+      var canvas = await html2canvas(el, {
+        width: res.w, height: res.h, scale: scale,
+        useCORS: true, allowTaint: true,
+        backgroundColor: '#ffffff', logging: false,
+        removeContainer: true, foreignObjectRendering: false
+      });
       var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
-      return new Promise(function(resolve, reject) { canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('blob fail')); }, mime, qual); });
-    } catch(e) { console.warn('html2canvas fail, trying SVG:', e); }
+      return new Promise(function(resolve, reject) {
+        canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('toBlob failed')); }, mime, qual);
+      });
+    } catch(e) { console.warn('html2canvas error, using SVG fallback:', e); }
   }
-  
-  // SVG fallback
+
+  // Method 2: SVG foreignObject
   var canvas = document.createElement('canvas');
-  var w = res.w*scale, h = res.h*scale;
+  var w = res.w * scale, h = res.h * scale;
   canvas.width = w; canvas.height = h;
   var ctx = canvas.getContext('2d');
-  var styles = idoc.querySelectorAll('style');
-  var css = ''; styles.forEach(function(s) { css += s.textContent; });
-  var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('width',w); svg.setAttribute('height',h); svg.setAttribute('viewBox','0 0 '+res.w+' '+res.h);
-  var fo = document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-  fo.setAttribute('width',res.w); fo.setAttribute('height',res.h);
-  var body = document.createElement('div');
-  body.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
-  body.style.cssText = 'width:'+res.w+'px;height:'+res.h+'px;position:relative;overflow:hidden;background:#fff;';
+
+  // Collect all styles
+  var allStyles = '';
+  document.querySelectorAll('style').forEach(function(s) { allStyles += s.textContent; });
+
+  var clone = el.cloneNode(true);
+  clone.style.cssText = 'position:absolute;inset:0;width:' + res.w + 'px;height:' + res.h + 'px;display:flex;';
+
+  var wrapper = document.createElement('div');
+  wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  wrapper.style.cssText = 'width:' + res.w + 'px;height:' + res.h + 'px;position:relative;overflow:hidden;background:#fff;';
   var styleEl = document.createElement('style');
-  styleEl.textContent = '*{box-sizing:border-box;margin:0;padding:0}.slide{position:relative;width:100%;height:100%;display:flex}' + css;
-  body.appendChild(styleEl);
-  var clone = (slide || idoc.body).cloneNode(true);
-  clone.style.cssText = 'position:absolute;inset:0;width:'+res.w+'px;height:'+res.h+'px;display:flex;';
-  body.appendChild(clone); fo.appendChild(body); svg.appendChild(fo);
-  var svgData = new XMLSerializer().serializeToString(svg);
-  var svgBlob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
+  styleEl.textContent = '*{box-sizing:border-box;margin:0;padding:0}' + allStyles;
+  wrapper.appendChild(styleEl);
+  wrapper.appendChild(clone);
+
+  var svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + res.w + ' ' + res.h + '">' +
+    '<foreignObject width="' + res.w + '" height="' + res.h + '">' +
+    new XMLSerializer().serializeToString(wrapper) +
+    '</foreignObject></svg>';
+
+  var svgBlob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
   var svgUrl = URL.createObjectURL(svgBlob);
+
   return new Promise(function(resolve, reject) {
     var img = new Image();
     img.onload = function() {
       ctx.drawImage(img, 0, 0, w, h);
       URL.revokeObjectURL(svgUrl);
       var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
-      canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('blob fail')); }, mime, qual);
+      canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('toBlob failed')); }, mime, qual);
     };
-    img.onerror = function() { URL.revokeObjectURL(svgUrl); reject(new Error('SVG fail')); };
+    img.onerror = function() { URL.revokeObjectURL(svgUrl); reject(new Error('SVG render failed')); };
     img.src = svgUrl;
   });
 }
@@ -1117,6 +1173,21 @@ function dlPDF() { if (state.pdf) { dl(state.pdf, state.fileName.replace(/\.html
 function dlPPTX() { if (state.pptx) { dl(state.pptx, state.fileName.replace(/\.html?$/i,'') + '.pptx'); toast('PPTX baixado'); } }
 function dl(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
 function cancelExport() { state.cancel = true; state.exporting = false; go('dash'); toast('Cancelado', 'warn'); }
+
+function openEditor() {
+  go('editor');
+  if (!E.inited) initEditor();
+  // Load analysis resolution into editor
+  if (state.analysis) {
+    E.w = state.analysis.res.w;
+    E.h = state.analysis.res.h;
+    document.getElementById('edW').value = E.w;
+    document.getElementById('edH').value = E.h;
+    E.canvas.style.width = E.w + 'px';
+    E.canvas.style.height = E.h + 'px';
+  }
+  toast('Editor aberto - adicione elementos');
+}
 
 // Editor export
 async function exportEditor() {
