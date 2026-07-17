@@ -9,7 +9,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#0C0C0E;color:#F0F0F2;height:100vh;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:#0C0C0E;color:#F0F0F2;height:100vh;overflow:hidden;transition:background .3s,color .3s}
+body.light{background:#FAFAFA;color:#1A1A2E}
+body.light .sidebar{background:#fff;border-right-color:#E0E0E4}
+body.light .sidebar-brand{color:#CC1A1A}
+body.light .nav-item{color:#4A4A5A}
+body.light .nav-item:hover{background:#F0F0F0;color:#1A1A2E}
+body.light .sidebar-footer{border-top-color:#E0E0E4;color:#7A7A8A}
+body.light .stat,.body.light .analysis-card,.body.light .config-card,.body.light .p-stat,.body.light .bar-wrap,.body.light .batch-item{background:#F5F5F5;border-color:#E0E0E4}
+body.light .dropzone{border-color:#E0E0E4}
+body.light .dropzone:hover,.body.light .dropzone.over{border-color:#CC1A1A;background:rgba(204,26,26,.03)}
+body.light .tab-content textarea{background:#F5F5F5;border-color:#E0E0E4;color:#1A1A2E}
+body.light .btn-ghost{background:transparent;color:#4A4A5A;border-color:#E0E0E4}
+body.light .btn-ghost:hover{background:#F0F0F0}
+body.light .ed-toolbar,.body.light .ed-topbar,.body.light .ed-panels,.body.light .sidebar .nav-label{background:#fff}
+body.light .ed-canvas-wrap{background:#F0F0F0}
+body.light .ed-panel-h{color:#7A7A8A}
+body.light .layer{color:#4A4A5A}
+body.light .layer:hover{background:#F0F0F0}
+body.light .ctx{background:#fff;border-color:#E0E0E4}
+body.light .ctx-item{color:#4A4A5A}
+body.light .ctx-item:hover{background:#F0F0F0}
+body.light .toast{background:#fff;border-color:#E0E0E4}
+body.light .fmt{background:#F0F0F0;border-color:#E0E0E4;color:#4A4A5A}
+body.light .fmt.sel{background:#CC1A1A;border-color:#CC1A1A;color:#fff}
+body.light .scale{background:#F0F0F0;border-color:#E0E0E4}
+body.light .scale.sel{border-color:#CC1A1A;background:rgba(204,26,26,.08)}
+body.light .form-select{background:#F0F0F0;border-color:#E0E0E4;color:#1A1A2E}
+body.light .sp-item{background:#F5F5F5;border-color:#E0E0E4}
+body.light .info-row{border-bottom-color:#EAEAEA}
+body.light .slide-thumb{background:#F0F0F0;border-color:#E0E0E4}
 
 /* LAYOUT */
 .app{display:flex;height:100vh}
@@ -226,6 +255,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0C0C0E;color:#F0F0F2;h
 <div class="app">
 <div class="sidebar">
   <div class="sidebar-brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>VetBrainX</div>
+  <div style="padding:0 12px 8px"><button onclick="toggleTheme()" style="width:100%;padding:6px 10px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:6px;color:#A0A0A8;font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" id="themeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px" id="themeIcon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><span id="themeLabel">Modo Claro</span></button></div>
   <div class="nav-label">Menu</div>
   <div class="nav-item active" onclick="go('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</div>
   <div class="nav-item" onclick="go('upload')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carregar</div>
@@ -659,55 +689,68 @@ function renderAnalysis(a) {
 }
 
 async function renderThumbnails(a) {
-  // Create ONE staging container per slide to avoid show/hide conflicts
   var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+  // Single container for all thumbnails
+  var stage = document.createElement('div');
+  stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
+  document.body.appendChild(stage);
+  stage.innerHTML = clean;
+
+  // Wait for content to render
+  await new Promise(function(r) { setTimeout(r, 2500); });
+  stage.offsetHeight;
+
+  var liveSlides = detectSlidesIn(stage);
+  console.log('[Thumbs] Found', liveSlides.length, 'slides for', a.count, 'thumbnails');
 
   for (var i = 0; i < a.count; i++) {
     var thumb = document.getElementById('thumb-' + i);
     if (!thumb) continue;
 
+    // Hide ALL slides first
+    for (var j = 0; j < liveSlides.length; j++) {
+      liveSlides[j].style.setProperty('display', 'none', 'important');
+    }
+
+    // Show ONLY the target slide
+    var slideEl = liveSlides[i] || stage;
+    slideEl.style.setProperty('display', 'flex', 'important');
+    slideEl.style.width = a.res.w + 'px';
+    slideEl.style.height = a.res.h + 'px';
+    slideEl.style.position = 'relative';
+    slideEl.style.overflow = 'hidden';
+
+    // Force reflow
+    void slideEl.offsetHeight;
+
     try {
-      // Each slide gets its own container
-      var stage = document.createElement('div');
-      stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
-      document.body.appendChild(stage);
-      stage.innerHTML = clean;
-      await new Promise(function(r) { setTimeout(r, 800); });
-      stage.offsetHeight;
-
-      var liveSlides = detectSlidesIn(stage);
-      var slideEl = liveSlides[i] || stage;
-
-      // Hide all except target
-      for (var j = 0; j < liveSlides.length; j++) {
-        if (liveSlides[j] !== slideEl) liveSlides[j].style.display = 'none';
-      }
-      slideEl.style.display = 'flex';
-      slideEl.style.width = a.res.w + 'px';
-      slideEl.style.height = a.res.h + 'px';
-      slideEl.offsetHeight;
-
       if (typeof html2canvas !== 'undefined') {
         var canvas = await html2canvas(slideEl, {
           width: a.res.w, height: a.res.h, scale: 0.4,
           useCORS: true, allowTaint: true,
           backgroundColor: '#ffffff', logging: false
         });
-        thumb.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
+        var dataUrl = canvas.toDataURL('image/png');
+        thumb.style.backgroundImage = 'url(' + dataUrl + ')';
         thumb.style.backgroundSize = 'cover';
         thumb.style.backgroundPosition = 'center';
         thumb.innerHTML = '<div style="position:absolute;bottom:4px;left:4px;right:4px;text-align:center;font-size:10px;font-weight:600;color:#fff;background:rgba(0,0,0,.6);border-radius:4px;padding:3px 6px">Slide ' + (i+1) + '</div>';
+        console.log('[Thumbs] Slide', i+1, 'rendered OK');
       } else {
         thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
       }
-
-      document.body.removeChild(stage);
     } catch(e) {
-      console.warn('Thumb', i, 'error:', e);
+      console.warn('[Thumbs] Slide', i+1, 'error:', e);
       thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
-      try { document.body.removeChild(stage); } catch(x) {}
     }
   }
+
+  // Restore all slides visibility (cleanup)
+  for (var j = 0; j < liveSlides.length; j++) {
+    liveSlides[j].style.removeProperty('display');
+  }
+  document.body.removeChild(stage);
 }
 
 // ========== FORMAT / SCALE SELECTION ==========
@@ -1454,6 +1497,32 @@ function updateDash() {
   if (!state.hist.length) { h.innerHTML = '<div class="history">Nenhuma exportacao ainda</div>'; return; }
   h.innerHTML = state.hist.slice(0,10).map(function(x) { return '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:8px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:600;font-size:13px">' + x.name + '</div><div style="font-size:11px;color:#6A6A74">' + x.slides + ' slides ' + x.fmt + ' ' + x.scale + ' ' + x.date + '</div></div><span style="font-size:11px;color:#22C55E">OK</span></div>'; }).join('');
 }
+
+// ========== THEME ==========
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  var isLight = document.body.classList.contains('light');
+  try { localStorage.setItem('vb-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  updateThemeBtn(isLight);
+}
+
+function updateThemeBtn(isLight) {
+  var icon = document.getElementById('themeIcon');
+  var label = document.getElementById('themeLabel');
+  if (isLight) {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    label.textContent = 'Modo Escuro';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    label.textContent = 'Modo Claro';
+  }
+}
+
+// Load saved theme
+try {
+  var savedTheme = localStorage.getItem('vb-theme');
+  if (savedTheme === 'light') { document.body.classList.add('light'); updateThemeBtn(true); }
+} catch(e) {}
 
 // ========== INIT ==========
 loadStats();
