@@ -1,1668 +1,1499 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>VetBrainX Export</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetBrain - Plataforma de Estudos Veterinários Inteligente</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E67E22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#0C0C0E;color:#F0F0F2;height:100vh;overflow:hidden;transition:background .3s,color .3s}
-body.light{background:#FAFAFA;color:#1A1A2E}
-body.light .sidebar{background:#fff;border-right-color:#E0E0E4}
-body.light .sidebar-brand{color:#CC1A1A}
-body.light .nav-item{color:#4A4A5A}
-body.light .nav-item:hover{background:#F0F0F0;color:#1A1A2E}
-body.light .sidebar-footer{border-top-color:#E0E0E4;color:#7A7A8A}
-body.light .stat,.body.light .analysis-card,.body.light .config-card,.body.light .p-stat,.body.light .bar-wrap,.body.light .batch-item{background:#F5F5F5;border-color:#E0E0E4}
-body.light .dropzone{border-color:#E0E0E4}
-body.light .dropzone:hover,.body.light .dropzone.over{border-color:#CC1A1A;background:rgba(204,26,26,.03)}
-body.light .tab-content textarea{background:#F5F5F5;border-color:#E0E0E4;color:#1A1A2E}
-body.light .btn-ghost{background:transparent;color:#4A4A5A;border-color:#E0E0E4}
-body.light .btn-ghost:hover{background:#F0F0F0}
-body.light .ed-toolbar,.body.light .ed-topbar,.body.light .ed-panels,.body.light .sidebar .nav-label{background:#fff}
-body.light .ed-canvas-wrap{background:#F0F0F0}
-body.light .ed-panel-h{color:#7A7A8A}
-body.light .layer{color:#4A4A5A}
-body.light .layer:hover{background:#F0F0F0}
-body.light .ctx{background:#fff;border-color:#E0E0E4}
-body.light .ctx-item{color:#4A4A5A}
-body.light .ctx-item:hover{background:#F0F0F0}
-body.light .toast{background:#fff;border-color:#E0E0E4}
-body.light .fmt{background:#F0F0F0;border-color:#E0E0E4;color:#4A4A5A}
-body.light .fmt.sel{background:#CC1A1A;border-color:#CC1A1A;color:#fff}
-body.light .scale{background:#F0F0F0;border-color:#E0E0E4}
-body.light .scale.sel{border-color:#CC1A1A;background:rgba(204,26,26,.08)}
-body.light .form-select{background:#F0F0F0;border-color:#E0E0E4;color:#1A1A2E}
-body.light .sp-item{background:#F5F5F5;border-color:#E0E0E4}
-body.light .info-row{border-bottom-color:#EAEAEA}
-body.light .slide-thumb{background:#F0F0F0;border-color:#E0E0E4}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#944a00;--on-primary:#fff;--primary-container:#e67e22;--on-primary-container:#502600;
+  --secondary:#4a6640;--on-secondary:#fff;--secondary-container:#c8e9b9;--on-secondary-container:#4e6a44;
+  --tertiary:#83439e;--on-tertiary:#fff;--tertiary-container:#c37ede;--on-tertiary-container:#500c6c;
+  --error:#ba1a1a;--on-error:#fff;--error-container:#ffdad6;--on-error-container:#93000a;
+  --surface:#fff8f0;--on-surface:#1e1b16;--surface-variant:#e8e2d8;--on-surface-variant:#564337;
+  --surface-container-lowest:#fff;--surface-container-low:#faf3e9;--surface-container:#f4ede3;
+  --surface-container-high:#eee7dd;--surface-container-highest:#e8e2d8;
+  --outline:#897365;--outline-variant:#dcc1b1;
+  --surface-bright:#fff8f0;--surface-dim:#e0d9d0;--surface-tint:#944a00;
+  --inverse-surface:#33302a;--inverse-on-surface:#f7f0e6;--inverse-primary:#ffb783;
+  --primary-fixed:#ffdcc5;--primary-fixed-dim:#ffb783;--on-primary-fixed:#301400;--on-primary-fixed-variant:#713700;
+  --secondary-fixed:#cbecbc;--secondary-fixed-dim:#b0d0a1;--on-secondary-fixed:#072104;--on-secondary-fixed-variant:#334d2a;
+  --tertiary-fixed:#f8d8ff;--tertiary-fixed-dim:#ebb2ff;--on-tertiary-fixed:#320047;--on-tertiary-fixed-variant:#692984;
+  --game-orange:#E37A49;--game-purple:#8A65B1;--game-blue:#3E7DBE;--game-green:#5A8B63;--game-beige:#A88755;
+  --radius:1rem;--radius-lg:2rem;--radius-xl:3rem;--radius-full:9999px;
+  --spacing-unit:8px;--spacing-gutter:16px;--spacing-container:24px;--spacing-section:40px;
+}
+html{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;line-height:1.5;color:var(--on-surface);background:var(--surface);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden;background:radial-gradient(circle at center,#fff8f0 0%,#f4ede3 100%)}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 100,'GRAD' 0,'opsz' 24}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input{font-family:inherit;border:none;outline:none}
+img{max-width:100%;display:block}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--outline-variant);border-radius:3px}
 
-/* LAYOUT */
-.app{display:flex;height:100vh}
-.sidebar{width:240px;background:#141416;border-right:1px solid #1E1E22;padding:16px 12px;display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-brand{font-size:16px;font-weight:700;padding:12px;color:#CC1A1A;display:flex;align-items:center;gap:8px}
-.sidebar-brand svg{width:20px;height:20px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#A0A0A8;transition:all .15s}
-.nav-item:hover{background:#222226;color:#F0F0F2}
-.nav-item.active{background:rgba(204,26,26,.12);color:#CC1A1A}
-.nav-item svg{width:18px;height:18px;opacity:.7}
-.nav-item.active svg{opacity:1}
-.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6A6A74;padding:16px 12px 6px;font-weight:600}
-.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid #1E1E22;text-align:center;font-size:11px;color:#6A6A74}
-.stripe{display:flex;height:3px;border-radius:99px;overflow:hidden;margin-top:8px}
-.stripe div{flex:1}
-.stripe .r{background:#CC1A1A}.stripe .b{background:#1A3A7A}.stripe .o{background:#E8822A}
+/* Utility Classes */
+.flex{display:flex}.flex-col{flex-direction:column}.flex-1{flex:1}.flex-wrap{flex-wrap:wrap}
+.items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}
+.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}
+.gap-1{gap:4px}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}.gap-6{gap:24px}.gap-8{gap:32px}
+.text-center{text-align:center}.text-left{text-align:left}.text-right{text-align:right}
+.relative{position:relative}.absolute{position:absolute}.fixed{position:fixed}.sticky{position:sticky}
+.top-0{top:0}.bottom-0{bottom:0}.left-0{left:0}.right-0{right:0}
+.z-10{z-index:10}.z-20{z-index:20}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}
+.w-full{width:100%}.h-full{height:100%}
+.max-w-md{max-width:28rem}.max-w-xl{max-width:36rem}.max-w-5xl{max-width:64rem}.max-w-7xl{max-width:80rem}
+.mx-auto{margin-left:auto;margin-right:auto}
+.p-2{padding:8px}.p-3{padding:12px}.p-4{padding:16px}.p-6{padding:24px}.p-8{padding:32px}
+.px-3{padding-left:12px;padding-right:12px}.px-4{padding-left:16px;padding-right:16px}.px-6{padding-left:24px;padding-right:24px}
+.py-2{padding-top:8px;padding-bottom:8px}.py-3{padding-top:12px;padding-bottom:12px}.py-4{padding-top:16px;padding-bottom:16px}
+.mb-2{margin-bottom:8px}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}.mb-8{margin-bottom:32px}.mb-12{margin-bottom:48px}
+.mt-2{margin-top:8px}.mt-4{margin-top:16px}.mt-6{margin-top:24px}.mt-8{margin-top:32px}
+.pt-4{padding-top:16px}.pt-8{padding-top:32px}.pt-12{padding-top:48px}
+.pb-8{padding-bottom:32px}.pb-24{padding-bottom:96px}
+.ml-2{margin-left:8px}.ml-4{margin-left:16px}
+.mr-2{margin-right:8px}
 
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.header{padding:20px 28px 0;flex-shrink:0}
-.header h1{font-size:24px;font-weight:700}
-.header p{color:#6A6A74;font-size:13px;margin-top:4px}
-.body{flex:1;overflow-y:auto;padding:20px 28px 28px}
+/* Typography */
+.text-xs{font-size:10px;line-height:1;letter-spacing:.05em;font-weight:700}
+.text-sm{font-size:12px;line-height:1;letter-spacing:.05em;font-weight:700}
+.text-md{font-size:16px;line-height:1.5;font-weight:500}
+.text-lg{font-size:18px;line-height:1.6;font-weight:500}
+.text-xl{font-size:22px;line-height:1.4;font-weight:700}
+.text-2xl{font-size:28px;line-height:1.3;font-weight:700}
+.text-3xl{font-size:40px;line-height:1.2;letter-spacing:-.02em;font-weight:800}
+.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}
 
-/* SCREENS */
-.screen{display:none}.screen.active{display:flex;flex-direction:column;height:100%}
+/* Colors */
+.bg-primary{background:var(--primary)}.bg-primary-container{background:var(--primary-container)}.bg-primary-fixed{background:var(--primary-fixed)}.bg-primary-fixed-dim{background:var(--primary-fixed-dim)}
+.bg-secondary{background:var(--secondary)}.bg-secondary-container{background:var(--secondary-container)}
+.bg-tertiary{background:var(--tertiary)}.bg-tertiary-container{background:var(--tertiary-container)}
+.bg-error{background:var(--error)}.bg-error-container{background:var(--error-container)}
+.bg-surface{background:var(--surface)}.bg-surface-bright{background:var(--surface-bright)}.bg-surface-variant{background:var(--surface-variant)}
+.bg-surface-container{background:var(--surface-container)}.bg-surface-container-low{background:var(--surface-container-low)}
+.bg-surface-container-lowest{background:var(--surface-container-lowest)}.bg-surface-container-high{background:var(--surface-container-high)}
+.bg-surface-container-highest{background:var(--surface-container-highest)}.bg-inverse-surface{background:var(--inverse-surface)}
+.bg-on-surface{background:var(--on-surface)}.bg-on-surface-variant{background:var(--on-surface-variant)}
+.bg-game-orange{background:var(--game-orange)}.bg-game-purple{background:var(--game-purple)}.bg-game-blue{background:var(--game-blue)}.bg-game-green{background:var(--game-green)}.bg-game-beige{background:var(--game-beige)}
 
-/* DASHBOARD */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:16px}
-.stat-val{font-size:28px;font-weight:700}
-.stat-lbl{font-size:11px;color:#6A6A74;margin-top:2px}
-.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.quick-btn{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:20px;cursor:pointer;text-align:center;transition:all .15s}
-.quick-btn:hover{border-color:#CC1A1A;transform:translateY(-2px)}
-.quick-btn svg{width:28px;height:28px;color:#CC1A1A;margin-bottom:8px}
-.quick-btn div{font-size:13px;font-weight:600}
-.quick-btn small{font-size:11px;color:#6A6A74}
-.history{font-size:13px;color:#6A6A74;text-align:center;padding:40px}
+.text-primary{color:var(--primary)}.text-on-primary{color:var(--on-primary)}.text-on-primary-container{color:var(--on-primary-container)}
+.text-secondary{color:var(--secondary)}.text-on-secondary{color:var(--on-secondary)}.text-on-secondary-container{color:var(--on-secondary-container)}
+.text-tertiary{color:var(--tertiary)}.text-on-tertiary{color:var(--on-tertiary)}.text-on-tertiary-container{color:var(--on-tertiary-container)}
+.text-error{color:var(--error)}.text-on-error{color:var(--on-error)}.text-on-error-container{color:var(--on-error-container)}
+.text-on-surface{color:var(--on-surface)}.text-on-surface-variant{color:var(--on-surface-variant)}
+.text-on-background{color:var(--on-surface)}.text-on-primary-fixed-variant{color:var(--on-primary-fixed-variant)}.text-on-secondary-fixed{color:var(--on-secondary-fixed)}.text-on-secondary-fixed-variant{color:var(--on-secondary-fixed-variant)}
+.text-white{color:#fff}.text-outline{color:var(--outline)}
 
-/* UPLOAD */
-.upload-area{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20px}
-.tabs{display:flex;background:#1A1A1E;border-radius:10px;padding:3px;gap:3px;width:100%;max-width:480px}
-.tab{flex:1;padding:10px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#A0A0A8;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
-.tab:hover{color:#F0F0F2}
-.tab.active{background:#CC1A1A;color:#fff}
-.tab svg{width:16px;height:16px}
-.tab-content{display:none;width:100%;max-width:480px;flex-direction:column;align-items:center;gap:16px}
-.tab-content.active{display:flex}
+.border{border:1px solid var(--outline-variant)}.border-surface{border-color:var(--surface)}.border-primary{border-color:var(--primary)}
 
-/* DROP ZONE */
-.dropzone{width:100%;border:2px dashed #2A2A30;border-radius:20px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .15s}
-.dropzone:hover,.dropzone.over{border-color:#CC1A1A;background:rgba(204,26,26,.03)}
-.dropzone svg{width:56px;height:56px;color:#6A6A74;margin-bottom:12px}
-.dropzone h3{font-size:16px;font-weight:600;margin-bottom:6px}
-.dropzone p{font-size:13px;color:#6A6A74;margin-bottom:16px}
-.upload-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#CC1A1A;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.upload-btn:hover{background:#E02020}
-.formats{display:flex;gap:6px;margin-top:12px}
-.formats span{font-size:10px;font-weight:600;color:#6A6A74;background:#2A2A30;padding:3px 8px;border-radius:99px}
+/* Border Radius */
+.rounded{border-radius:var(--radius)}.rounded-lg{border-radius:var(--radius-lg)}.rounded-xl{border-radius:var(--radius-lg)}.rounded-2xl{border-radius:var(--radius-xl)}.rounded-full{border-radius:var(--radius-full)}
 
-/* PASTE */
-.paste-box{width:100%;display:flex;flex-direction:column;gap:12px}
-.paste-box textarea{width:100%;min-height:220px;padding:14px;background:#1A1A1E;border:2px solid #2A2A30;border-radius:12px;color:#F0F0F2;font-family:monospace;font-size:13px;line-height:1.5;resize:vertical;transition:border-color .15s}
-.paste-box textarea:focus{outline:none;border-color:#CC1A1A}
-.paste-box textarea::placeholder{color:#4A4A52}
-.paste-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.btn-ghost{padding:8px 16px;background:transparent;color:#A0A0A8;border:1px solid #2A2A30;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.btn-ghost:hover{background:#1A1A1E;color:#F0F0F2}
-.paste-hint{font-size:11px;color:#6A6A74;text-align:center}
-.paste-hint b{color:#A0A0A8}
-.char-count{font-size:11px;color:#6A6A74;text-align:right}
-.analyze-btn{padding:14px 28px;background:#CC1A1A;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
-.analyze-btn:hover{background:#E02020}
+/* Shadows */
+.shadow-sm{box-shadow:0 1px 2px rgba(0,0,0,.05)}.shadow{box-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}.shadow-md{box-shadow:0 4px 6px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06)}.shadow-lg{box-shadow:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05)}.shadow-xl{box-shadow:0 20px 25px rgba(0,0,0,.1),0 10px 10px rgba(0,0,0,.04)}
+.shadow-3d{box-shadow:0 4px 0 var(--primary),0 10px 20px -5px rgba(230,126,34,.4)}
+.shadow-tactile{box-shadow:0 6px 0 0 rgba(0,0,0,.15)}.shadow-tactile-green{box-shadow:0 6px 0 0 #334d2a}.shadow-tactile-purple{box-shadow:0 6px 0 0 #500c6c}.shadow-tactile-red{box-shadow:0 6px 0 0 #93000a}
 
-/* ANALYSIS */
-.analysis-layout{display:grid;grid-template-columns:1fr 300px;gap:20px}
-.analysis-card{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:16px;margin-bottom:16px}
-.analysis-title{font-size:12px;font-weight:600;color:#6A6A74;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.analysis-title svg{width:14px;height:14px;opacity:.6}
-.slide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.slide-thumb{aspect-ratio:1;background:#2A2A30;border:1px solid #2A2A30;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .15s}
-.slide-thumb:hover{border-color:#CC1A1A}
-.slide-num{font-size:20px;font-weight:700;color:#6A6A74}
-.slide-lbl{font-size:9px;color:#6A6A74;text-transform:uppercase;margin-top:2px}
-.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1E1E22;font-size:12px}
-.info-row:last-child{border:none}
-.info-row span:first-child{color:#A0A0A8}
-.info-row span:last-child{font-weight:600}
-.config-card{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:16px}
-.config-title{font-size:12px;font-weight:600;color:#6A6A74;text-transform:uppercase;margin-bottom:12px}
-.formats-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.fmt{padding:5px 12px;background:#2A2A30;border:1px solid #2A2A30;border-radius:99px;font-size:11px;font-weight:600;color:#A0A0A8;cursor:pointer;transition:all .15s}
-.fmt:hover{color:#F0F0F2}
-.fmt.sel{background:#CC1A1A;border-color:#CC1A1A;color:#fff}
-.scale-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
-.scale{padding:8px;background:#2A2A30;border:1px solid #2A2A30;border-radius:8px;text-align:center;cursor:pointer;transition:all .15s}
-.scale:hover{border-color:#6A6A74}
-.scale.sel{border-color:#CC1A1A;background:rgba(204,26,26,.08)}
-.scale b{display:block;font-size:14px}.scale small{font-size:9px;color:#6A6A74}
-.form-label{font-size:11px;font-weight:600;color:#A0A0A8;margin-bottom:4px;display:block}
-.form-select{width:100%;padding:6px 10px;background:#2A2A30;border:1px solid #2A2A30;border-radius:8px;color:#F0F0F2;font-family:inherit;font-size:12px;cursor:pointer}
-.sidebar-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.btn-primary{padding:12px;background:#CC1A1A;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-primary:hover{background:#E02020}
-.btn-green{padding:12px;background:#22C55E;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-green:hover{background:#16a34a}
-.btn-secondary{padding:10px;background:#1A1A1E;color:#F0F0F2;border:1px solid #2A2A30;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;width:100%}
-.btn-secondary:hover{background:#222226}
+/* Card Styles */
+.card{background:var(--surface-container-lowest);border-radius:var(--radius-lg);border:1px solid var(--outline-variant);box-shadow:0 20px 40px -10px rgba(0,0,0,.05),0 0 0 1px rgba(255,255,255,.5) inset}
+.card-glass{background:rgba(255,255,255,.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.4);box-shadow:0 4px 30px rgba(0,0,0,.05)}
+.card-tactile{transition:transform .1s,box-shadow .1s}.card-tactile:active{transform:translateY(4px);box-shadow:none!important}
 
-/* PROGRESS */
-.progress-wrap{display:flex;flex-direction:column;gap:20px}
-.progress-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.p-stat{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:16px;text-align:center}
-.p-stat .v{font-size:32px;font-weight:700}
-.p-stat .v.red{color:#CC1A1A}.p-stat .v.green{color:#22C55E}
-.p-stat .l{font-size:11px;color:#6A6A74;margin-top:2px}
-.bar-wrap{background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:20px}
-.bar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.bar-header b{font-size:14px}.bar-header .pct{font-size:20px;font-weight:700;color:#CC1A1A}
-.bar-track{height:6px;background:#2A2A30;border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;background:linear-gradient(90deg,#CC1A1A,#E8822A);border-radius:99px;transition:width .4s}
-.bar-info{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#6A6A74}
-.slide-progress{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.sp-item{aspect-ratio:1;background:#1A1A1E;border:1px solid #2A2A30;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
-.sp-item.done{border-color:#22C55E}.sp-item.active{border-color:#CC1A1A}
-.sp-item .n{font-size:18px;font-weight:700;color:#6A6A74}
-.sp-item.done .n{color:#22C55E}
-.sp-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#6A6A74}
-.sp-item.done .sp-dot{background:#22C55E}
-.sp-item.active .sp-dot{background:#CC1A1A;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+/* Button Styles */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;border-radius:var(--radius);padding:12px 24px;transition:all .1s}
+.btn-primary{background:var(--primary-container);color:var(--on-primary-container);box-shadow:0 4px 0 #944a00,0 10px 20px -5px rgba(230,126,34,.4)}.btn-primary:active{transform:translateY(4px);box-shadow:none}
+.btn-secondary{background:var(--secondary);color:var(--on-secondary);box-shadow:0 6px 0 #334d2a}.btn-secondary:active{transform:translateY(6px);box-shadow:none}
+.btn-error{background:var(--error);color:var(--on-error);box-shadow:0 6px 0 #93000a}.btn-error:active{transform:translateY(6px);box-shadow:none}
+.btn-tertiary{background:var(--tertiary-container);color:var(--on-tertiary-container);box-shadow:0 6px 0 #500c6c}.btn-tertiary:active{transform:translateY(6px);box-shadow:none}
+.btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary-fixed-dim);box-shadow:0 4px 0 var(--surface-tint)}.btn-outline:active{transform:translateY(4px);box-shadow:none}
+.btn-pill{border-radius:var(--radius-full);padding:8px 16px;font-size:12px;font-weight:700}
+.btn-game{border-radius:var(--radius-full);padding:12px 24px;font-size:12px;font-weight:700;color:#fff}
 
-/* COMPLETE */
-.complete{text-align:center;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.complete-icon{width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center}
-.complete-icon svg{width:36px;height:36px;color:#22C55E}
-.complete h2{font-size:24px}
-.complete p{color:#6A6A74;font-size:14px}
-.complete-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:500px}
-.complete-stats .stat{padding:12px}
-.complete-stats .stat-val{font-size:20px}
-.complete-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+/* Input Styles */
+.input{width:100%;background:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--radius);padding:12px 16px;font-size:16px;color:var(--on-surface);box-shadow:inset 0 2px 4px rgba(0,0,0,.05);transition:all .2s}
+.input:focus{outline:none;box-shadow:inset 0 2px 4px rgba(0,0,0,.05),0 0 0 2px var(--primary);border-color:var(--primary)}
+.input::placeholder{color:rgba(86,67,55,.5)}
 
-/* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1A1A1E;border:1px solid #2A2A30;border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:999;box-shadow:0 12px 40px rgba(0,0,0,.5);transition:transform .25s;font-size:13px;font-weight:500}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:#22C55E}.toast.ok svg{color:#22C55E}
-.toast.err{border-color:#EF4444}.toast.err svg{color:#EF4444}
-.toast.warn{border-color:#F59E0B}.toast.warn svg{color:#F59E0B}
-.toast svg{width:18px;height:18px;flex-shrink:0}
+/* Progress Bar */
+.progress-bar{height:6px;background:var(--surface-variant);border-radius:3px;overflow:hidden}.progress-bar-fill{height:100%;border-radius:3px;transition:width .3s}
 
-/* EDITOR */
-.editor-layout{display:flex;flex:1;overflow:hidden}
-.ed-toolbar{width:48px;background:#141416;border-right:1px solid #1E1E22;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:3px;flex-shrink:0}
-.ed-tool{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#A0A0A8;background:transparent;border:none;transition:all .15s}
-.ed-tool:hover{background:#222226;color:#F0F0F2}
-.ed-tool.active{background:rgba(204,26,26,.12);color:#CC1A1A}
-.ed-tool svg{width:18px;height:18px}
-.ed-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.ed-topbar{height:40px;background:#141416;border-bottom:1px solid #1E1E22;display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
-.ed-canvas-wrap{flex:1;overflow:auto;background:#0C0C0E;display:flex;align-items:center;justify-content:center}
-.ed-canvas{background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.5);position:relative}
-.ed-el{position:absolute;cursor:move;user-select:none}
-.ed-el.sel{outline:2px solid #CC1A1A;outline-offset:1px}
-.ed-handle{position:absolute;width:7px;height:7px;background:#CC1A1A;border:1px solid #fff;border-radius:2px;z-index:10}
-.ed-panels{width:260px;background:#141416;border-left:1px solid #1E1E22;overflow-y:auto;flex-shrink:0}
-.ed-panel{border-bottom:1px solid #1E1E22}
-.ed-panel-h{padding:10px 14px;font-size:11px;font-weight:600;color:#6A6A74;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between}
-.ed-panel-h:hover{color:#F0F0F2}
-.ed-panel-b{padding:0 14px 14px}
-.pr{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.pr label{font-size:11px;color:#A0A0A8;min-width:24px}
-.pr input[type=number],.pr select{flex:1;padding:4px 6px;background:#2A2A30;border:1px solid #2A2A30;border-radius:4px;color:#F0F0F2;font-size:11px;font-family:inherit}
-.pr input[type=number]{width:50px}
-.pr input[type=color]{width:28px;height:28px;border:1px solid #2A2A30;border-radius:4px;padding:0;cursor:pointer}
-.pr input[type=range]{flex:1}
-.layer{display:flex;align-items:center;gap:6px;padding:6px;border-radius:4px;cursor:pointer;font-size:11px;color:#A0A0A8;transition:all .15s}
-.layer:hover{background:#222226}
-.layer.active{background:rgba(204,26,26,.12);color:#CC1A1A}
-.layer svg{width:14px;height:14px;opacity:.6}
+/* Progress Circle */
+.progress-circle{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--primary-container) var(--p),var(--surface-variant) 0);display:flex;align-items:center;justify-content:center;position:relative}
+.progress-circle::before{content:"";position:absolute;width:52px;height:52px;border-radius:50%;background-color:var(--surface-container-lowest)}
+.progress-value{position:relative;font-weight:700;color:var(--on-surface);font-size:14px}
 
-/* CONTEXT MENU */
-.ctx{position:fixed;background:#141416;border:1px solid #2A2A30;border-radius:8px;padding:3px;min-width:160px;z-index:200;box-shadow:0 12px 40px rgba(0,0,0,.5);display:none}
-.ctx.show{display:block}
-.ctx-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;cursor:pointer;font-size:12px;color:#A0A0A8;transition:all .15s}
-.ctx-item:hover{background:#222226;color:#F0F0F2}
-.ctx-item svg{width:13px;height:13px}
-.ctx hr{border:none;border-top:1px solid #1E1E22;margin:3px 0}
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:center;align-items:center;padding-bottom:8px;margin-bottom:24px;pointer-events:none}
+.bottom-nav-inner{background:rgba(200,233,185,.9);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 15px rgba(0,0,0,.1);border-radius:var(--radius-full);padding:8px;display:flex;align-items:center;gap:8px;pointer-events:auto}
+.bottom-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;width:64px;height:64px;border-radius:50%;color:var(--on-secondary-container);opacity:.7;transition:all .2s;cursor:pointer}
+.bottom-nav-item:hover{opacity:1;transform:scale(1.1)}
+.bottom-nav-item.active{background:var(--primary);color:var(--on-primary);opacity:1;box-shadow:0 4px 6px rgba(0,0,0,.1)}
 
-/* BATCH */
-.batch-wrap{display:flex;flex-direction:column;gap:16px}
-.batch-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:8px}
-.batch-item svg{width:16px;height:16px;color:#E8822A}
-.batch-item .name{flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.batch-item .meta{font-size:10px;color:#6A6A74}
-.batch-item .badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
-.badge.ready{background:rgba(34,197,94,.12);color:#22C55E}
-.badge.working{background:rgba(204,26,26,.12);color:#CC1A1A}
-.badge.done{background:rgba(34,197,94,.12);color:#22C55E}
-.badge.error{background:rgba(239,68,68,.12);color:#EF4444}
+/* Top Header */
+.top-header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,248,240,.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.05);padding:8px 24px;display:none}
+@media(min-width:768px){.top-header{display:flex;justify-content:space-between;align-items:center}}
 
-.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+/* Page Container */
+.page{display:none;min-height:100vh;padding-bottom:120px;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-@media(max-width:768px){.sidebar{display:none}.stats,.quick{grid-template-columns:1fr}.analysis-layout{grid-template-columns:1fr}.ed-panels{display:none}}
+/* Mobile Responsive */
+@media(max-width:767px){
+  .mobile-only{display:flex!important}.desktop-only{display:none!important}
+  .grid-mobile{grid-template-columns:1fr!important}
+  .flex-mobile-col{flex-direction:column!important}
+  .hide-mobile{display:none!important}
+}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-full);font-size:12px;font-weight:700}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--inverse-surface);color:var(--inverse-on-surface);padding:12px 24px;border-radius:var(--radius-full);font-weight:700;font-size:14px;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Dark mode support */
+@media(prefers-color-scheme:dark){/* placeholder for dark mode */}
 </style>
 </head>
 <body>
 
-<input type="file" id="fileInput" class="file-hidden" accept=".html,.htm"/>
-<input type="file" id="batchFileInput" class="file-hidden" accept=".html,.htm" multiple/>
-<input type="file" id="imageInput" class="file-hidden" accept="image/*"/>
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
 
-<div class="app">
-<div class="sidebar">
-  <div class="sidebar-brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>VetBrainX</div>
-  <div style="padding:0 12px 8px"><button onclick="toggleTheme()" style="width:100%;padding:6px 10px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:6px;color:#A0A0A8;font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" id="themeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px" id="themeIcon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><span id="themeLabel">Modo Claro</span></button></div>
-  <div class="nav-label">Menu</div>
-  <div class="nav-item active" onclick="go('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</div>
-  <div class="nav-item" onclick="go('upload')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carregar</div>
-  <div class="nav-item" onclick="go('batch')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Lote</div>
-  <div class="nav-label">Editor</div>
-  <div class="nav-item" onclick="go('editor')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Editor</div>
-  <div class="sidebar-footer"><div class="stripe"><div class="r"></div><div class="b"></div><div class="o"></div></div>VetBrainX Export v1.0</div>
-</div>
-
-<div class="main">
-
-<!-- DASHBOARD -->
-<div class="screen active" id="s-dash">
-  <div class="header"><h1>Painel</h1><p>Visao geral das suas exportacoes</p></div>
-  <div class="body">
-    <div class="quick">
-      <div class="quick-btn" onclick="go('upload')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div>Carregar Arquivo</div><small>Upload HTML</small></div>
-      <div class="quick-btn" onclick="showPaste()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg><div>Colar HTML</div><small>Cole o codigo</small></div>
-      <div class="quick-btn" onclick="go('batch')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><div>Lote</div><small>Multiplos arquivos</small></div>
+<!-- Top Header (Desktop) -->
+<header class="top-header" id="topHeader">
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary" style="font-size:28px;font-variation-settings:'FILL' 1">pets</span>
+      <span class="text-xl font-extrabold text-primary">VetBrain</span>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="stat-val" id="st-slides">0</div><div class="stat-lbl">Slides exportados</div></div>
-      <div class="stat"><div class="stat-val" id="st-files">0</div><div class="stat-lbl">Arquivos</div></div>
-      <div class="stat"><div class="stat-val" id="st-last">-</div><div class="stat-lbl">Ultima exportacao</div></div>
-      <div class="stat"><div class="stat-val" id="st-rate">-</div><div class="stat-lbl">Taxa sucesso</div></div>
-    </div>
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px">Historico</div>
-    <div id="history"><div class="history">Nenhuma exportacao ainda</div></div>
+    <nav class="flex gap-4">
+      <a class="nav-link text-on-surface-variant font-bold pb-1 cursor-pointer" data-page="dashboard" style="border-bottom:2px solid transparent" onclick="navigateTo('dashboard')">Início</a>
+      <a class="nav-link text-on-surface-variant font-bold pb-1 cursor-pointer" data-page="memory" style="border-bottom:2px solid transparent" onclick="navigateTo('memory')">Memória</a>
+      <a class="nav-link text-on-surface-variant font-bold pb-1 cursor-pointer" data-page="arena" style="border-bottom:2px solid transparent" onclick="navigateTo('arena')">Arena</a>
+      <a class="nav-link text-on-surface-variant font-bold pb-1 cursor-pointer" data-page="social" style="border-bottom:2px solid transparent" onclick="navigateTo('social')">Mural</a>
+    </nav>
   </div>
-</div>
+  <div class="flex-1 max-w-xl mx-8">
+    <div class="relative flex items-center">
+      <span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+      <input class="input rounded-full pl-10" placeholder="Buscar flashcards, quizzes, módulos..." type="text" style="box-shadow:inset 0 2px 4px rgba(0,0,0,.05)">
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-1 bg-surface-variant px-3 py-1.5 rounded-lg shadow-sm">
+      <span class="material-symbols-outlined text-on-surface-variant text-sm">local_fire_department</span>
+      <span class="text-xs text-on-surface-variant">0 dias</span>
+    </div>
+    <div class="flex items-center gap-2 cursor-pointer bg-surface-variant/30 py-1 pl-1 pr-3 rounded-full" onclick="navigateTo('profile')">
+      <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-sm font-bold">?</div>
+      <span class="material-symbols-outlined text-sm">expand_more</span>
+    </div>
+  </div>
+</header>
 
-<!-- UPLOAD -->
-<div class="screen" id="s-upload">
-  <div class="header"><h1>Carregar Arquivo</h1><p>Upload, arraste ou cole seu HTML</p></div>
-  <div class="body upload-area">
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('upload',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload</button>
-      <button class="tab" onclick="switchTab('paste',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg>Colar HTML</button>
+<!-- ========== PAGE: LOGIN ========== -->
+<div class="page active" id="page-login">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 relative">
+    <!-- Theme Toggle -->
+    <div class="absolute top-4 right-4">
+      <button class="bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant rounded-full p-2 flex items-center justify-center shadow-sm hover:scale-105 transition-transform">
+        <span class="material-symbols-outlined text-primary">light_mode</span>
+      </button>
     </div>
-    <div class="tab-content active" id="tc-upload">
-      <div class="dropzone" id="dropzone">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <h3>Arraste seu arquivo HTML aqui</h3>
-        <p>Carrossel, slides, apresentacoes</p>
-        <label for="fileInput" class="upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Selecionar Arquivo</label>
-        <div class="formats"><span>HTML</span><span>HTM</span></div>
+    <!-- Logo -->
+    <div class="text-center mb-8 flex flex-col items-center">
+      <div class="w-20 h-20 bg-primary-container rounded-[24px] flex items-center justify-center mb-4 shadow-3d">
+        <span class="material-symbols-outlined text-white" style="font-size:40px;font-variation-settings:'FILL' 1">pets</span>
       </div>
+      <h1 class="text-3xl font-extrabold text-on-surface mb-2">VetBrain</h1>
+      <p class="text-md text-on-surface-variant">Plataforma de estudos inteligente</p>
     </div>
-    <div class="tab-content" id="tc-paste">
-      <div class="paste-box">
-        <div style="text-align:center"><svg viewBox="0 0 24 24" fill="none" stroke="#6A6A74" stroke-width="1.5" style="width:40px;height:40px;margin-bottom:8px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg><div style="font-weight:600;margin-bottom:2px">Cole seu HTML aqui</div><div style="font-size:12px;color:#6A6A74">Copie e cole o codigo do seu carrossel</div></div>
-        <textarea id="pasteArea" placeholder="<!DOCTYPE html>&#10;<html>&#10;  <body>&#10;    <!-- Cole aqui -->&#10;  </body>&#10;</html>" spellcheck="false"></textarea>
-        <div class="char-count" id="charCount">0 caracteres</div>
-        <div class="paste-actions">
-          <button class="btn-ghost" onclick="clearPaste()">Limpar</button>
-          <button class="btn-ghost" onclick="doClipboard()">Colar da Area de Transferencia</button>
-          <button class="analyze-btn" onclick="doPaste()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Analisar e Exportar</button>
+    <!-- Login Card -->
+    <div class="w-full max-w-md bg-surface-container-lowest rounded-2xl p-8 mb-8 card flex flex-col gap-6">
+      <!-- Google Login -->
+      <button class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3 px-4 flex items-center justify-center gap-3 hover:bg-surface-container-low transition-colors shadow-sm" onclick="handleGoogleLogin()">
+        <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <span class="text-md font-bold text-on-surface">Entrar com Google</span>
+      </button>
+      <!-- Divider -->
+      <div class="flex items-center gap-4 w-full">
+        <div class="h-px bg-outline-variant flex-1"></div>
+        <span class="text-xs text-on-surface-variant lowercase">ou</span>
+        <div class="h-px bg-outline-variant flex-1"></div>
+      </div>
+      <!-- Email Login -->
+      <div class="flex flex-col gap-4">
+        <p class="text-md text-on-surface-variant text-center text-sm">Entrar com email e código de acesso</p>
+        <div class="flex flex-col gap-3">
+          <input class="input" placeholder="seu@email.com" type="email" id="loginEmail">
+          <input class="input" placeholder="Código de acesso" type="text" id="loginCode">
         </div>
-        <div class="paste-hint"><b>Dica:</b> Funciona com HTML de qualquer ferramenta de design.</div>
+        <button class="btn btn-primary w-full mt-2" onclick="handleEmailLogin()">Entrar</button>
+      </div>
+    </div>
+    <!-- Footer Modules -->
+    <div class="w-full max-w-md grid grid-cols-3 gap-3">
+      <div class="bg-surface-container-lowest rounded-xl p-3 flex items-center gap-3 border border-outline-variant/30 hover:scale-105 transition-transform cursor-pointer" onclick="navigateTo('social')">
+        <div class="w-10 h-10 rounded-lg bg-[#2e7d32] flex items-center justify-center shrink-0 shadow-md">
+          <span class="material-symbols-outlined text-white" style="font-size:20px">menu_book</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-on-surface leading-tight">Literatura<br>Científica</span>
+          <span class="text-[10px] text-on-surface-variant mt-0.5">15+ plataformas</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-3 flex items-center gap-3 border border-outline-variant/30 hover:scale-105 transition-transform cursor-pointer" onclick="navigateTo('arena')">
+        <div class="w-10 h-10 rounded-lg bg-[#1565c0] flex items-center justify-center shrink-0 shadow-md">
+          <span class="material-symbols-outlined text-white" style="font-size:20px">api</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-on-surface leading-tight">Guia de<br>APIs</span>
+          <span class="text-[9px] text-on-surface-variant mt-0.5 leading-tight">REST.<br>GraphQL.<br>Python</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-3 flex items-center gap-3 border border-outline-variant/30 hover:scale-105 transition-transform cursor-pointer" onclick="navigateTo('dashboard')">
+        <div class="w-10 h-10 rounded-lg bg-[#a1432f] flex items-center justify-center shrink-0 shadow-md">
+          <span class="material-symbols-outlined text-white" style="font-size:20px">forest</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-on-surface leading-tight">Fazenda<br>DIP</span>
+          <span class="text-[10px] text-on-surface-variant mt-0.5">23 fases<br>imersivas</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ANALYSIS -->
-<div class="screen" id="s-analysis">
-  <div class="header"><h1 id="a-name">-</h1><p>Pronto para edicao ou exportacao</p></div>
-  <div class="body">
-    <div class="analysis-layout">
+<!-- ========== PAGE: DASHBOARD ========== -->
+<div class="page" id="page-dashboard">
+  <div class="pt-20 px-6 md:px-8 max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h1 class="text-3xl font-extrabold text-on-surface mb-2">Mapa do curso</h1>
+      <p class="text-lg text-on-surface-variant">Medicina Veterinária · UFRPE · 11 períodos</p>
+    </div>
+    <!-- Horizontal Scrollable Map -->
+    <div class="flex gap-12 relative min-w-max pb-12 pt-4 pl-4 overflow-x-auto" style="scrollbar-width:none" id="courseMap">
+      <!-- Period 1 -->
+      <div class="flex flex-col gap-4 relative z-10 w-48">
+        <div class="bg-surface-variant/80 rounded-t-xl px-4 py-2 text-center -mx-2 -mt-6 mb-2">
+          <span class="text-xs text-on-surface-variant">P1 sem</span>
+        </div>
+        <button class="bg-secondary-container rounded-xl p-4 text-left flex flex-col justify-between h-24 shadow-3d border-2 border-secondary" style="box-shadow:0 4px 0 #4a6640">
+          <span class="text-md text-on-secondary-container leading-tight">Anatomia<br>Veterinária I</span>
+          <div class="flex justify-end w-full"><span class="material-symbols-outlined text-secondary text-sm">check</span></div>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-20 border border-surface-variant" onclick="navigateTo('anatomy3d')">
+          <span class="text-md text-on-surface leading-tight">Biofísica</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-24 border border-surface-variant" onclick="navigateTo('flashcards')">
+          <span class="text-md text-on-surface leading-tight">Bioquímica<br>Veterinária</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-24 border border-surface-variant">
+          <span class="text-md text-on-surface leading-tight">Citologia,<br>Embriologia...</span>
+        </button>
+      </div>
+      <!-- Period 2 -->
+      <div class="flex flex-col gap-4 relative z-10 w-48 pt-10">
+        <div class="bg-surface-variant/80 rounded-t-xl px-4 py-2 text-center -mx-2 absolute top-0 left-0 right-0">
+          <span class="text-xs text-on-surface-variant">P2 sem</span>
+        </div>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-24 border border-surface-variant mt-2" onclick="navigateTo('flashcards')">
+          <span class="text-md text-on-surface leading-tight">Fisiologia<br>Veterinária</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-20 border border-surface-variant">
+          <span class="text-md text-on-surface leading-tight">Imunologia</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-20 border border-surface-variant opacity-70">
+          <span class="text-md text-on-surface-variant leading-tight">Patologia Geral</span>
+          <div class="flex justify-end w-full"><span class="material-symbols-outlined text-outline text-sm">lock</span></div>
+        </button>
+      </div>
+      <!-- Period 3 -->
+      <div class="flex flex-col gap-4 relative z-10 w-48 pt-10">
+        <div class="bg-surface-variant/80 rounded-t-xl px-4 py-2 text-center -mx-2 absolute top-0 left-0 right-0">
+          <span class="text-xs text-on-surface-variant">P3 sem</span>
+        </div>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-20 border border-surface-variant mt-2 opacity-70">
+          <span class="text-md text-on-surface-variant leading-tight">Patologia Geral</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 text-left flex flex-col justify-between h-20 border border-surface-variant">
+          <span class="text-md text-on-surface leading-tight">Imunologia</span>
+        </button>
+      </div>
+    </div>
+    <!-- Right Sidebar (Desktop) -->
+    <aside class="hidden md:flex flex-col gap-6 max-w-sm mx-auto mt-8">
+      <!-- Profile -->
+      <div class="flex flex-col items-center bg-surface-container/60 backdrop-blur-xl rounded-xl p-6 border border-white/10 shadow-xl">
+        <div class="w-40 h-40 rounded-full bg-surface-container-high flex items-center justify-center mb-4 border-4 border-surface-container-lowest shadow-md">
+          <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px">person</span>
+        </div>
+        <div class="w-full mb-2"><div class="h-3 bg-surface-variant rounded-full overflow-hidden"><div class="h-full bg-surface-container-high" style="width:0%"></div></div></div>
+        <div class="flex justify-between w-full text-xs text-on-surface-variant mb-4">
+          <span class="text-on-surface font-bold">0 XP</span><span>Comece a estudar</span>
+        </div>
+        <div class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs shadow-sm">Nível 0 · Iniciante</div>
+      </div>
+      <!-- Review Radar -->
+      <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/30">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-on-surface">Radar de revisão</h2>
+          <span class="bg-surface-variant px-3 py-1 rounded-lg text-xs text-on-surface-variant">Hoje</span>
+        </div>
+        <div class="flex flex-col gap-3">
+          <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-variant text-center">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">inbox</span>
+            <p class="text-md text-on-surface-variant mt-2">Nenhum card para revisar</p>
+            <p class="text-xs text-on-surface-variant mt-1">Importe ou crie cards para começar</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ========== PAGE: MEMORY ========== -->
+<div class="page" id="page-memory">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8 flex flex-col gap-10">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-2xl bg-tertiary-container/20 flex items-center justify-center transform -rotate-12 shadow-sm border border-tertiary-container/30">
+        <span class="material-symbols-outlined text-tertiary" style="font-size:32px;font-variation-settings:'FILL' 1">psychology</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-on-surface tracking-tight">Memória</h1>
+    </div>
+    <!-- Stats Row -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform">
+        <div class="w-12 h-12 rounded-lg bg-tertiary-container flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-tertiary-container">neurology</span>
+        </div>
+        <div class="flex flex-col"><span class="text-2xl font-bold text-on-surface">0</span><span class="text-md text-on-surface-variant">Total</span></div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform">
+        <div class="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-secondary">check_circle</span>
+        </div>
+        <div class="flex flex-col"><span class="text-2xl font-bold text-on-surface">0</span><span class="text-md text-on-surface-variant">Dominados</span></div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform">
+        <div class="w-12 h-12 rounded-lg bg-primary-fixed-dim flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-primary-fixed-variant" style="font-variation-settings:'FILL' 1">bolt</span>
+        </div>
+        <div class="flex flex-col"><span class="text-2xl font-bold text-on-surface">0</span><span class="text-md text-on-surface-variant">Dias Streak</span></div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform">
+        <div class="w-12 h-12 rounded-lg bg-[#d95d41] flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-white">track_changes</span>
+        </div>
+        <div class="flex flex-col"><span class="text-2xl font-bold text-on-surface">0%</span><span class="text-md text-on-surface-variant">Precisão</span></div>
+      </div>
+    </section>
+    <div class="h-px w-full bg-outline-variant/30"></div>
+    <!-- Action Grid -->
+    <section class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1 bg-surface-container-lowest rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-md border border-outline-variant/20 gap-6 min-h-[300px]">
+        <h2 class="text-xl font-bold text-on-surface">Revisão Hoje</h2>
+        <p class="text-md text-on-surface-variant">0 cards</p>
+        <span class="material-symbols-outlined text-[64px] text-on-surface-variant my-4">sync</span>
+        <button class="btn btn-primary w-full max-w-[280px]" onclick="navigateTo('flashcards')">Revisar Agora</button>
+      </div>
+      <div class="flex-1 grid grid-cols-2 gap-4">
+        <button class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/20 hover:-translate-y-1 transition-transform group text-left" onclick="navigateTo('deckmarketplace')">
+          <div class="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-on-secondary">upload</span></div>
+          <span class="text-lg font-bold text-on-surface leading-tight">Importar<br>Cards</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-outline-variant/20 hover:-translate-y-1 transition-transform group text-left" onclick="navigateTo('study_collections')">
+          <div class="w-12 h-12 rounded-xl bg-[#9e6f54] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-white">layers</span></div>
+          <div class="flex flex-col"><span class="text-lg font-bold text-on-surface">Decks</span><span class="text-md text-on-surface-variant">0 decks</span></div>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm border border-outline-variant/20 hover:-translate-y-1 transition-transform group" onclick="navigateTo('analytics')">
+          <div class="w-14 h-14 rounded-2xl bg-[#3a6ea5] flex items-center justify-center group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-white" style="font-size:28px;font-variation-settings:'FILL' 1">bar_chart</span></div>
+          <span class="text-lg font-bold text-on-surface">Estatísticas</span>
+        </button>
+        <button class="bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm border border-outline-variant/20 hover:-translate-y-1 transition-transform group" onclick="navigateTo('memory_settings')">
+          <div class="w-14 h-14 rounded-2xl bg-[#a87042] flex items-center justify-center group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-white" style="font-size:28px;font-variation-settings:'FILL' 1">settings</span></div>
+          <span class="text-lg font-bold text-on-surface">Config.</span>
+        </button>
+      </div>
+    </section>
+    <div class="h-px w-full bg-outline-variant/30"></div>
+    <!-- Laboratory -->
+    <section class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row items-center gap-4 shadow-sm border border-outline-variant/20">
+      <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center shrink-0 shadow-inner">
+        <span class="material-symbols-outlined text-[#c55a40]" style="font-size:40px;font-variation-settings:'FILL' 1">science</span>
+      </div>
+      <div class="flex-1 flex flex-col gap-1 text-center md:text-left">
+        <h3 class="text-xl font-bold text-on-surface">Laboratório</h3>
+        <p class="text-md text-on-surface-variant max-w-xl">Gere flashcards automaticamente a partir de materiais de estudo (.txt, .pdf)</p>
+      </div>
+      <button class="btn btn-primary shrink-0" onclick="navigateTo('card_lab')">Abrir <span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span></button>
+    </section>
+  </div>
+</div>
+
+<!-- ========== PAGE: FLASHCARDS ========== -->
+<div class="page" id="page-flashcards">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 relative">
+    <!-- Header Pill -->
+    <div class="bg-surface-container rounded-full px-6 py-3 flex items-center gap-3 shadow-sm mb-6 z-10 border border-surface-variant/50 backdrop-blur-md">
+      <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">psychology</span>
+      <h1 class="text-xl font-bold text-on-surface"><span class="text-primary font-extrabold">VetBrain</span> Flashcard Review</h1>
+    </div>
+    <!-- Status Bar -->
+    <div class="bg-surface-container rounded-full p-2 flex flex-wrap justify-center items-center gap-2 mb-8 shadow-sm z-10">
+      <div class="flex items-center bg-surface-variant text-on-surface-variant rounded-full px-4 py-1.5 gap-2">
+        <span class="material-symbols-outlined text-sm">menu_book</span>
+        <span class="text-xs">Total</span>
+        <span class="bg-outline-variant text-on-surface rounded-full px-2 py-0.5 text-xs">0</span>
+      </div>
+      <div class="flex items-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 gap-2">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">check_circle</span>
+        <span class="text-xs">Dominados</span>
+        <span class="bg-secondary text-on-secondary rounded-full px-2 py-0.5 text-xs">0</span>
+      </div>
+      <div class="flex items-center bg-tertiary-container text-on-tertiary-container rounded-full px-4 py-1.5 gap-2">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">schedule</span>
+        <span class="text-xs">Hoje</span>
+        <span class="bg-tertiary text-on-tertiary rounded-full px-2 py-0.5 text-xs">0</span>
+      </div>
+      <div class="flex items-center bg-error-container text-on-error-container rounded-full px-4 py-1.5 gap-2">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">sentiment_dissatisfied</span>
+        <span class="text-xs">Difíceis</span>
+        <span class="bg-error text-on-error rounded-full px-2 py-0.5 text-xs">0</span>
+      </div>
+    </div>
+    <!-- Main Flashcard -->
+    <div class="relative w-full max-w-4xl mb-12 group cursor-pointer z-10" id="flashcardContainer" onclick="flipCard()">
+      <div class="absolute inset-0 bg-outline rounded-[2.5rem] transform translate-y-3 shadow-lg"></div>
+      <div class="relative bg-tertiary text-on-tertiary rounded-[2.5rem] p-10 min-h-[300px] flex flex-col justify-center items-center text-center shadow-[inset_0_4px_6px_rgba(255,255,255,.2)] border-2 border-tertiary-fixed-dim/30 transition-all duration-300" id="flashcard">
+        <div id="flashcard-front">
+          <h2 class="text-3xl mb-8 max-w-3xl leading-tight" id="flashcard-question">Adicione seu primeiro flashcard para começar a revisar</h2>
+          <div class="opacity-80 text-lg flex items-center gap-2 mt-auto">
+            <span class="material-symbols-outlined animate-bounce">touch_app</span> Clique para ver a resposta
+          </div>
+        </div>
+        <div id="flashcard-back" class="hidden">
+          <h2 class="text-2xl mb-6 max-w-3xl leading-tight">Use o Laboratório para gerar cards automaticamente ou crie manualmente.</h2>
+          <p class="text-lg opacity-80">Clique para voltar à pergunta</p>
+        </div>
+      </div>
+    </div>
+    <!-- Evaluation Buttons -->
+    <div class="flex flex-wrap justify-center gap-4 z-10 w-full max-w-4xl">
+      <button class="btn btn-error flex-1 min-w-[140px] shadow-tactile-red" onclick="rateCard('again')">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">replay</span> Novamente
+      </button>
+      <button class="btn btn-primary flex-1 min-w-[140px]" style="box-shadow:0 6px 0 #713700" onclick="rateCard('hard')">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">help</span> Difícil
+      </button>
+      <button class="btn btn-tertiary flex-1 min-w-[140px] shadow-tactile-purple" onclick="rateCard('good')">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">thumb_up</span> Bom
+      </button>
+      <button class="btn btn-secondary flex-1 min-w-[140px] shadow-tactile-green" onclick="rateCard('easy')">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">sentiment_satisfied</span> Fácil
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ARENA ========== -->
+<div class="page" id="page-arena">
+  <div class="px-6 md:px-8 max-w-7xl mx-auto pt-12 pb-32">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-6">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 bg-game-purple rounded-2xl flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">neurology</span>
+        </div>
+        <div><h1 class="text-3xl font-extrabold mb-1">Arena</h1><p class="text-md text-on-surface-variant">Desafie seus conhecimentos.</p></div>
+      </div>
+      <div class="flex gap-4 items-center">
+        <div class="flex items-center gap-2 bg-surface-container py-2 px-4 rounded-full border border-outline-variant/30">
+          <span class="material-symbols-outlined text-on-surface-variant text-sm">layers</span>
+          <span class="text-xs text-on-surface-variant">0 cards</span>
+        </div>
+        <div class="flex items-center gap-2 bg-primary-fixed py-2 px-4 rounded-full border border-primary-fixed-dim/30">
+          <span class="material-symbols-outlined text-on-primary-fixed-variant text-sm">pending_actions</span>
+          <span class="text-xs text-on-primary-fixed-variant">0 pendentes</span>
+        </div>
+      </div>
+    </div>
+    <!-- Filter Bar -->
+    <nav class="flex items-center gap-8 border-b border-outline-variant/30 pb-4 w-full mb-10 overflow-x-auto">
+      <button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs whitespace-nowrap"><span class="material-symbols-outlined text-sm">history</span> Revisão</button>
+      <button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs whitespace-nowrap"><span class="material-symbols-outlined text-sm">upload</span> Importar</button>
+      <button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs whitespace-nowrap"><span class="material-symbols-outlined text-sm">view_carousel</span> Decks</button>
+      <button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs whitespace-nowrap" onclick="navigateTo('analytics')"><span class="material-symbols-outlined text-sm">bar_chart</span> Estatísticas</button>
+      <button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs whitespace-nowrap" onclick="navigateTo('memory_settings')"><span class="material-symbols-outlined text-sm">settings</span> Config.</button>
+    </nav>
+    <!-- Game Modes Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-8">
+      <!-- Quiz Rápido -->
+      <div class="bg-surface-container-lowest rounded-[2rem] p-3 shadow-lg flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+        <div class="h-32 bg-game-orange rounded-2xl flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner"><span class="material-symbols-outlined text-white text-3xl">bolt</span></div>
+        </div>
+        <div class="px-3 flex-grow flex flex-col text-center">
+          <h3 class="text-xl font-bold mb-2">Quiz Rápido</h3>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-6 font-normal">Teste seus conhecimentos em um quiz rápido.</p>
+          <button class="btn btn-game bg-game-orange w-full mt-auto" style="box-shadow:0 4px 0 0 #B55B32" onclick="startQuiz('quick')">INICIAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+        </div>
+      </div>
+      <!-- Simulado -->
+      <div class="bg-surface-container-lowest rounded-[2rem] p-3 shadow-lg flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+        <div class="h-32 bg-game-purple rounded-2xl flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner"><span class="material-symbols-outlined text-white text-3xl">trophy</span></div>
+        </div>
+        <div class="px-3 flex-grow flex flex-col text-center">
+          <h3 class="text-xl font-bold mb-2">Simulado</h3>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-6 font-normal">Simule seus conhecimentos como uma prova real.</p>
+          <button class="btn btn-game bg-game-purple w-full mt-auto" style="box-shadow:0 4px 0 0 #614480" onclick="startQuiz('simulado')">INICIAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+        </div>
+      </div>
+      <!-- Desafio Relâmpago -->
+      <div class="bg-surface-container-lowest rounded-[2rem] p-3 shadow-lg flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+        <div class="h-32 bg-game-blue rounded-2xl flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner"><span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings:'FILL' 1">neurology</span></div>
+        </div>
+        <div class="px-3 flex-grow flex flex-col text-center">
+          <h3 class="text-xl font-bold mb-2">Desafio Relâmpago</h3>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-6 font-normal">Desafio cronizado contra o tempo.</p>
+          <button class="btn btn-game bg-game-blue w-full mt-auto" style="box-shadow:0 4px 0 0 #2B5A8C" onclick="startQuiz('lightning')">INICIAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+        </div>
+      </div>
+      <!-- Modo Leve -->
+      <div class="bg-surface-container-lowest rounded-[2rem] p-3 shadow-lg flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+        <div class="h-32 bg-game-green rounded-2xl flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner"><span class="material-symbols-outlined text-white text-3xl">eco</span></div>
+        </div>
+        <div class="px-3 flex-grow flex flex-col text-center">
+          <h3 class="text-xl font-bold mb-2">Modo Leve</h3>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-6 font-normal">Revisão leve e descontraída.</p>
+          <button class="btn btn-game bg-game-green w-full mt-auto" style="box-shadow:0 4px 0 0 #3E6345" onclick="startQuiz('light')">INICIAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+        </div>
+      </div>
+      <!-- Looping Adaptativo -->
+      <div class="bg-surface-container-lowest rounded-[2rem] p-3 shadow-lg flex flex-col h-full hover:-translate-y-2 transition-transform duration-300">
+        <div class="h-32 bg-game-beige rounded-2xl flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner"><span class="material-symbols-outlined text-white text-3xl">loop</span></div>
+        </div>
+        <div class="px-3 flex-grow flex flex-col text-center">
+          <h3 class="text-xl font-bold mb-2">Looping Adaptativo</h3>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-6 font-normal">Loop adaptativo de revisão.</p>
+          <button class="btn btn-game bg-game-beige w-full mt-auto" style="box-shadow:0 4px 0 0 #7A6038" onclick="startQuiz('looping')">INICIAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+        </div>
+      </div>
+    </div>
+    <!-- Game Settings Panel -->
+    <div class="w-full bg-surface-container-lowest/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 md:p-8 shadow-lg relative mt-8">
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-game-beige shadow-inner border border-white/50">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">settings</span>
+          </div>
+          <h2 class="text-xl font-bold">Configurações do Jogo</h2>
+        </div>
+        <button class="btn btn-game bg-game-beige" style="box-shadow:0 3px 0 0 #7A6038">Recolher</button>
+      </div>
       <div>
-        <div class="analysis-card">
-          <div class="analysis-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Slides Detectados (<span id="a-count">0</span>)</div>
-          <div class="slide-grid" id="a-grid"></div>
-        </div>
-        <div class="analysis-card">
-          <div class="analysis-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Analise</div>
-          <div id="a-info"></div>
+        <div class="flex justify-between items-center mb-4"><span class="text-lg font-bold">Número de Questões: <span id="questionCount">10</span></span></div>
+        <input type="range" min="5" max="30" value="10" class="w-full" id="questionSlider" oninput="document.getElementById('questionCount').textContent=this.value">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: SOCIAL FEED ========== -->
+<div class="page" id="page-social">
+  <div class="max-w-[1400px] w-full mx-auto px-6 md:px-8 pt-12 pb-8 flex flex-col lg:flex-row gap-6">
+    <!-- Main Content -->
+    <main class="flex-1 card-glass rounded-xl flex flex-col p-6 relative overflow-hidden bg-surface-container-lowest/80">
+      <div class="flex flex-col md:flex-row gap-8 flex-1">
+        <!-- Sidebar Nav -->
+        <nav class="w-48 flex flex-col gap-2 hide-mobile">
+          <a class="flex items-center gap-3 bg-primary-fixed-dim/30 text-primary-fixed-variant font-bold rounded-lg px-4 py-3 transition-colors cursor-pointer" onclick="navigateTo('social')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span> Mural</a>
+          <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 font-bold rounded-lg px-4 py-3 transition-colors cursor-pointer" onclick="navigateTo('study_collections')"><span class="material-symbols-outlined">school</span> Estudos</a>
+          <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 font-bold rounded-lg px-4 py-3 transition-colors cursor-pointer" onclick="navigateTo('analytics')"><span class="material-symbols-outlined">format_list_bulleted</span> Atividades</a>
+          <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 font-bold rounded-lg px-4 py-3 transition-colors cursor-pointer" onclick="navigateTo('profile')"><span class="material-symbols-outlined">person</span> Perfil</a>
+        </nav>
+        <!-- Center Content -->
+        <div class="flex-1 flex flex-col gap-8">
+          <div class="flex flex-col md:flex-row gap-8">
+            <!-- Recent Activity -->
+            <div class="flex-1">
+              <h2 class="text-xl font-bold mb-4">Atividade Recente</h2>
+              <div class="flex flex-col gap-3">
+                <div class="bg-surface-container-lowest rounded-lg p-8 shadow-sm border border-outline-variant/30 text-center">
+                  <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">inbox</span>
+                  <p class="text-md text-on-surface-variant mt-3">Nenhuma atividade ainda</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Comece a revisar cards para ver sua atividade aqui</p>
+                </div>
+              </div>
+            </div>
+            <!-- Meu Ciclo -->
+            <div class="w-full md:w-1/3 min-w-[250px]">
+              <h2 class="text-xl font-bold mb-4">Meu Ciclo</h2>
+              <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/30 h-[300px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div class="text-primary-container/30 mb-6"><span class="material-symbols-outlined" style="font-size:80px">post_add</span></div>
+                <button class="btn btn-primary w-full max-w-[200px] mb-4" onclick="showToast('Publicando no ciclo social...')">Comece a postar</button>
+                <p class="text-on-surface-variant text-sm">Nenhum post no<br>seu ciclo ainda</p>
+              </div>
+            </div>
+          </div>
+          <!-- Trending Global -->
+          <div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">Trending Global</h2>
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+              <button class="bg-primary-fixed-dim/40 text-primary-fixed-variant px-4 py-1.5 rounded-full text-xs whitespace-nowrap">Global</button>
+              <button class="bg-surface-container-highest text-on-surface px-4 py-1.5 rounded-full text-xs whitespace-nowrap border border-outline-variant/20 hover:bg-surface-variant">Nacional</button>
+              <button class="bg-surface-container-highest text-on-surface px-4 py-1.5 rounded-full text-xs whitespace-nowrap border border-outline-variant/20 hover:bg-surface-variant">Internacional</button>
+              <button class="bg-surface-container-highest text-on-surface px-4 py-1.5 rounded-full text-xs whitespace-nowrap border border-outline-variant/20 hover:bg-surface-variant">Tag</button>
+              <button class="bg-surface-container-highest text-on-surface px-4 py-1.5 rounded-full text-xs whitespace-nowrap border border-outline-variant/20 hover:bg-surface-variant">Área</button>
+            </div>
+            <div class="flex gap-4 overflow-x-auto pb-4">
+              <div class="bg-surface-container-lowest min-w-[220px] rounded-xl p-6 shadow-sm border border-outline-variant/30 flex flex-col items-center justify-center text-center">
+                <span class="material-symbols-outlined text-on-surface-variant" style="font-size:32px">trending_up</span>
+                <p class="text-sm text-on-surface-variant mt-2">Nenhum conteúdo trending</p>
+                <p class="text-xs text-on-surface-variant mt-1">Posts da comunidade aparecerão aqui</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <button class="absolute bottom-6 right-1/2 translate-x-1/2 bg-primary-container text-on-primary-container font-bold px-6 py-3 rounded-full shadow-md transition-transform flex items-center gap-2 z-10 hover:scale-105" onclick="showToast('Abrir editor de post...')">Publicar no Ciclo Social</button>
+    </main>
+    <!-- Right Panel -->
+    <aside class="w-full lg:w-[340px] flex flex-col gap-6">
+      <!-- Domínio por eixo -->
+      <div class="card-glass rounded-xl p-6 bg-surface-container-lowest/80">
+        <h2 class="text-xl font-bold mb-6">Domínio por eixo</h2>
+        <div class="grid grid-cols-3 gap-y-6 gap-x-2 place-items-center">
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Morfologia</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Pré-clínica</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Clínica</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Saúde Públ.</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Produção</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant text-center h-8">Formação</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+        </div>
+      </div>
+      <!-- Meu Perfil -->
+      <div class="card-glass rounded-xl p-6 bg-surface-container-lowest/80 flex flex-col">
+        <h2 class="text-xl font-bold mb-6">Meu Perfil</h2>
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-xl font-bold border-2 border-surface">?</div>
+          <div><h3 class="text-lg font-bold">Novo Usuário</h3><p class="text-on-surface-variant">Crie sua conta para começar</p></div>
+        </div>
+        <div class="flex justify-between text-center mb-6 px-2">
+          <div><p class="text-xl font-bold">0</p><p class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">Cadernos</p></div>
+          <div><p class="text-xl font-bold">0</p><p class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">Posts</p></div>
+          <div><p class="text-md font-bold mt-1">--</p><p class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">Membro</p></div>
+        </div>
+        <button class="btn btn-outline w-full mb-6" onclick="navigateTo('profile')">Ver perfil completo</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ========== PAGE: PROFILE ========== -->
+<div class="page" id="page-profile">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="card rounded-2xl p-8 mb-6">
+      <div class="flex items-center gap-6 mb-8">
+        <div class="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-4xl font-extrabold border-4 border-surface shadow-lg">?</div>
+        <div>
+          <h1 class="text-2xl font-extrabold mb-1">Novo Usuário</h1>
+          <p class="text-on-surface-variant">Crie sua conta para começar</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="bg-surface-container-low rounded-xl p-4"><p class="text-2xl font-bold">0</p><p class="text-xs text-on-surface-variant uppercase tracking-wider">XP Total</p></div>
+        <div class="bg-surface-container-low rounded-xl p-4"><p class="text-2xl font-bold">0</p><p class="text-xs text-on-surface-variant uppercase tracking-wider">Cards</p></div>
+        <div class="bg-surface-container-low rounded-xl p-4"><p class="text-2xl font-bold">0</p><p class="text-xs text-on-surface-variant uppercase tracking-wider">Streak</p></div>
+      </div>
+    </div>
+    <div class="card rounded-2xl p-8">
+      <h2 class="text-xl font-bold mb-6">Configurações</h2>
+      <div class="flex flex-col gap-4">
+        <button class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-variant/30 transition-colors" onclick="navigateTo('memory_settings')">
+          <span class="material-symbols-outlined text-primary">settings</span>
+          <div class="text-left"><p class="font-bold">Configurações de Estudo</p><p class="text-sm text-on-surface-variant">Repetição espaçada, motor neural</p></div>
+          <span class="material-symbols-outlined text-on-surface-variant ml-auto">chevron_right</span>
+        </button>
+        <button class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-variant/30 transition-colors">
+          <span class="material-symbols-outlined text-primary">notifications</span>
+          <div class="text-left"><p class="font-bold">Notificações</p><p class="text-sm text-on-surface-variant">Alertas e lembretes</p></div>
+          <span class="material-symbols-outlined text-on-surface-variant ml-auto">chevron_right</span>
+        </button>
+        <button class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-variant/30 transition-colors">
+          <span class="material-symbols-outlined text-primary">privacy_tip</span>
+          <div class="text-left"><p class="font-bold">Privacidade</p><p class="text-sm text-on-surface-variant">Configurações de visibilidade</p></div>
+          <span class="material-symbols-outlined text-on-surface-variant ml-auto">chevron_right</span>
+        </button>
+        <button class="flex items-center gap-4 p-4 rounded-xl hover:bg-surface-variant/30 transition-colors" onclick="handleLogout()">
+          <span class="material-symbols-outlined text-error">logout</span>
+          <div class="text-left"><p class="font-bold text-error">Sair da conta</p></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ANALYTICS ========== -->
+<div class="page" id="page-analytics">
+  <div class="max-w-6xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-[#3a6ea5] flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">bar_chart</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Análise de Desempenho</h1>
+    </div>
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="card rounded-xl p-6 text-center"><p class="text-3xl font-extrabold text-primary">0</p><p class="text-sm text-on-surface-variant mt-1">Total de Cards</p></div>
+      <div class="card rounded-xl p-6 text-center"><p class="text-3xl font-extrabold text-secondary">0</p><p class="text-sm text-on-surface-variant mt-1">Dominados</p></div>
+      <div class="card rounded-xl p-6 text-center"><p class="text-3xl font-extrabold text-tertiary">0</p><p class="text-sm text-on-surface-variant mt-1">Para Revisar Hoje</p></div>
+      <div class="card rounded-xl p-6 text-center"><p class="text-3xl font-extrabold text-error">0</p><p class="text-sm text-on-surface-variant mt-1">Difíceis</p></div>
+    </div>
+    <!-- Charts Placeholder -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="card rounded-xl p-6">
+        <h3 class="text-xl font-bold mb-4">Mapa de Calor de Erros</h3>
+        <div class="h-48 bg-surface-variant/30 rounded-xl flex items-center justify-center">
+          <div class="grid grid-cols-7 gap-1" id="heatmap"></div>
+        </div>
+      </div>
+      <div class="card rounded-xl p-6">
+        <h3 class="text-xl font-bold mb-4">Produtividade Semanal</h3>
+        <div class="h-48 bg-surface-variant/30 rounded-xl flex items-center justify-center">
+          <div class="text-center">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">bar_chart</span>
+            <p class="text-sm text-on-surface-variant mt-2">Sem dados de produtividade</p>
+          </div>
+        </div>
+        <div class="flex justify-around mt-2 text-xs text-on-surface-variant"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+      </div>
+    </div>
+    <!-- Radar Chart -->
+    <div class="card rounded-xl p-6">
+      <h3 class="text-xl font-bold mb-4">Radar de Domínio</h3>
+      <div class="flex justify-center">
+        <div class="grid grid-cols-3 gap-6 place-items-center max-w-md">
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Morfologia</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Pré-clínica</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Clínica</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Saúde Públ.</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Produção</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+          <div class="flex flex-col items-center gap-2"><span class="text-xs text-on-surface-variant">Formação</span><div class="progress-circle" style="--p:0%"><span class="progress-value">0%</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: MEMORY SETTINGS ========== -->
+<div class="page" id="page-memory_settings">
+  <div class="max-w-3xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-[#a87042] flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">settings</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Configurações de Repetição Espaçada</h1>
+    </div>
+    <div class="card rounded-2xl p-8 flex flex-col gap-6">
+      <!-- Motor Neural -->
       <div>
-        <div class="config-card">
-          <div class="config-title">Exportacao</div>
-          <label class="form-label">Formato</label>
-          <div class="formats-row" id="fmtRow"><span class="fmt sel" data-f="png">PNG</span><span class="fmt" data-f="jpg">JPG</span><span class="fmt" data-f="webp">WEBP</span><span class="fmt" data-f="pdf">PDF</span><span class="fmt" data-f="pptx">PPTX</span><span class="fmt" data-f="canva">Canva</span></div>
-          <label class="form-label">Escala</label>
-          <div class="scale-grid" id="scaleRow"><div class="scale sel" data-s="1"><b>1x</b><small>Original</small></div><div class="scale" data-s="2"><b>2x</b><small>Dobro</small></div><div class="scale" data-s="3"><b>3x</b><small>Triplo</small></div><div class="scale" data-s="4"><b>4x</b><small>4x</small></div></div>
-          <label class="form-label">Qualidade</label>
-          <select class="form-select" id="qual"><option value="1">Maxima (lossless)</option><option value="0.95">Alta (95%)</option><option value="0.85">Media (85%)</option></select>
-        </div>
-        <div class="sidebar-btns">
-          <button class="btn-primary" onclick="openEditor()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>EDITAR DESIGN</button>
-          <button class="btn-green" onclick="doExport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>EXPORTAR</button>
-          <button class="btn-secondary" onclick="go('upload')">Voltar</button>
+        <h3 class="text-xl font-bold mb-2">Configuração do Motor Neural</h3>
+        <p class="text-md text-on-surface-variant mb-4">Ajuste como o algoritmo adapta a dificuldade</p>
+        <div class="bg-surface-container-low rounded-xl p-4 flex items-center justify-between">
+          <span class="font-bold">Modo Adaptativo</span>
+          <div class="w-12 h-6 bg-primary-container rounded-full relative cursor-pointer"><div class="w-4 h-4 bg-surface-container-lowest rounded-full absolute right-1 top-1 shadow-sm"></div></div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- PROGRESS -->
-<div class="screen" id="s-progress">
-  <div class="header"><h1>Exportando...</h1><p id="p-name">-</p></div>
-  <div class="body">
-    <div class="progress-wrap">
-      <div class="progress-stats">
-        <div class="p-stat"><div class="v red" id="p-slides">0</div><div class="l">Slides</div></div>
-        <div class="p-stat"><div class="v" id="p-time">00:00</div><div class="l">Restante</div></div>
-        <div class="p-stat"><div class="v green" id="p-scale">1x</div><div class="l">Escala</div></div>
-      </div>
-      <div class="bar-wrap">
-        <div class="bar-header"><b>Progresso</b><span class="pct" id="pct">0%</span></div>
-        <div class="bar-track"><div class="bar-fill" id="bar" style="width:0%"></div></div>
-        <div class="bar-info"><span id="p-fmt">-</span><span id="p-detail">Preparando...</span></div>
-      </div>
-      <div class="analysis-card">
-        <div class="analysis-title">Miniaturas</div>
-        <div class="slide-progress" id="sp-grid"></div>
-      </div>
-      <div style="text-align:center"><button class="btn-secondary" style="width:auto;padding:8px 20px" onclick="cancelExport()">Cancelar</button></div>
-    </div>
-  </div>
-</div>
-
-<!-- COMPLETE -->
-<div class="screen" id="s-complete">
-  <div class="header"><h1>Exportacao Concluida</h1><p id="c-name">-</p></div>
-  <div class="body">
-    <div class="complete">
-      <div class="complete-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-      <h2>Pronto!</h2>
-      <p id="c-summary">-</p>
-      <div class="complete-stats" id="c-stats"></div>
-      <div class="complete-btns" id="c-btns"></div>
-      <button class="btn-secondary" style="width:auto;margin-top:12px;padding:10px 24px" onclick="go('upload')">Carregar Outro</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDITOR -->
-<div class="screen" id="s-editor">
-  <div class="editor-layout">
-    <div class="ed-toolbar">
-      <button class="ed-tool active" data-t="select" onclick="setTool('select')" title="Selecionar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg></button>
-      <button class="ed-tool" data-t="hand" onclick="setTool('hand')" title="Mover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 00-4 0v5"/><path d="M14 10V4a2 2 0 00-4 0v6"/><path d="M10 10.5V6a2 2 0 00-4 0v8"/><path d="M18 8a2 2 0 014 0v6a8 8 0 01-8 8h-2c-2.5 0-4-1-5.5-2.5L3 15"/></svg></button>
-      <hr style="width:24px;border:none;border-top:1px solid #1E1E22;margin:3px 0">
-      <button class="ed-tool" data-t="text" onclick="setTool('text')" title="Texto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
-      <button class="ed-tool" data-t="rect" onclick="setTool('rect')" title="Retangulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
-      <button class="ed-tool" data-t="circle" onclick="setTool('circle')" title="Circulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></button>
-      <button class="ed-tool" data-t="image" onclick="setTool('image')" title="Imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
-      <hr style="width:24px;border:none;border-top:1px solid #1E1E22;margin:3px 0">
-      <button class="ed-tool" onclick="edUndo()" title="Desfazer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></button>
-      <button class="ed-tool" onclick="edRedo()" title="Refazer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></button>
-      <div style="flex:1"></div>
-      <button class="ed-tool" onclick="edDelete()" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-    </div>
-    <div class="ed-area">
-      <div class="ed-topbar">
-        <button class="ed-tool" onclick="edToggleGrid()" title="Grade" style="width:28px;height:28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
-        <div style="flex:1"></div>
-        <div id="slideNav" style="display:none;align-items:center;gap:8px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:6px;padding:2px 6px">
-          <button class="ed-tool" onclick="edPrevSlide()" style="width:24px;height:24px" title="Slide anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <span id="slideCounter" style="font-size:11px;font-weight:600;color:#A0A0A8;min-width:60px;text-align:center">1 / 1</span>
-          <button class="ed-tool" onclick="edNextSlide()" style="width:24px;height:24px" title="Proximo slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <div class="h-px bg-outline-variant/30"></div>
+      <!-- Ciclo Cognitivo -->
+      <div>
+        <h3 class="text-xl font-bold mb-2">Ciclo Cognitivo de Estudos</h3>
+        <p class="text-md text-on-surface-variant mb-4">Duração das sessões e pausas</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-surface-container-low rounded-xl p-4"><p class="text-xs text-on-surface-variant uppercase mb-1">Sessão</p><p class="text-xl font-bold">25 min</p></div>
+          <div class="bg-surface-container-low rounded-xl p-4"><p class="text-xs text-on-surface-variant uppercase mb-1">Pausa</p><p class="text-xl font-bold">5 min</p></div>
         </div>
-        <div style="flex:1"></div>
-        <button class="btn-secondary" style="width:auto;padding:4px 10px;font-size:11px" onclick="go(state.analysis?'analysis':'dash')">Voltar</button>
-        <button class="btn-primary" style="width:auto;padding:4px 10px;font-size:11px" onclick="exportEditor()">Exportar</button>
       </div>
-      <div class="ed-canvas-wrap" id="edWrap">
-        <div class="ed-canvas" id="edCanvas"></div>
-      </div>
-    </div>
-    <div class="ed-panels">
-      <div class="ed-panel"><div class="ed-panel-h">Propriedades</div><div class="ed-panel-b" id="edProps"><div style="text-align:center;padding:16px;color:#6A6A74;font-size:11px">Selecione um elemento</div></div></div>
-      <div class="ed-panel"><div class="ed-panel-h">Camadas</div><div class="ed-panel-b" id="edLayers"></div></div>
-      <div class="ed-panel"><div class="ed-panel-h">Canvas</div><div class="ed-panel-b"><div class="pr"><label>W</label><input type="number" id="edW" value="1080" onchange="edResize()"><label>H</label><input type="number" id="edH" value="1080" onchange="edResize()"></div><div class="pr"><label>Cor</label><input type="color" id="edBg" value="#ffffff" onchange="E.bg=this.value;E.canvas.style.background=this.value"></div><div class="pr" style="margin-top:6px"><label>Img</label><button class="btn-ghost" style="flex:1;font-size:11px;padding:4px 8px" onclick="document.getElementById('bgImageInput').click()">Escolher fundo</button><button class="btn-ghost" style="font-size:11px;padding:4px 8px" onclick="E.bgImg='';E.canvas.style.backgroundImage='';toast('Fundo removido')">X</button></div><input type="file" id="bgImageInput" class="file-hidden" accept="image/*" onchange="setBgImage(this)"></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- BATCH -->
-<div class="screen" id="s-batch">
-  <div class="header"><h1>Exportacao em Lote</h1><p>Selecione multiplos arquivos HTML</p></div>
-  <div class="body">
-    <div class="batch-wrap">
-      <div class="dropzone" id="batchDrop">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        <h3>Arraste multiplos arquivos</h3>
-        <p>Ou selecione varios de uma vez</p>
-        <label for="batchFileInput" class="upload-btn">Selecionar Arquivos</label>
-      </div>
-      <div id="batchList" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600" id="batchTitle">Arquivos (0)</span><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="clearBatch()">Limpar</button><button class="btn-primary" style="width:auto;padding:8px 16px" onclick="doBatch()">Exportar Todos</button></div></div>
-        <div id="batchItems"></div>
+      <div class="h-px bg-outline-variant/30"></div>
+      <!-- Dificuldade Arena -->
+      <div>
+        <h3 class="text-xl font-bold mb-2">Ajuste de Dificuldade - Arena</h3>
+        <p class="text-md text-on-surface-variant mb-4">Controle a dificuldade dos quizzes da arena</p>
+        <input type="range" min="1" max="5" value="3" class="w-full">
+        <div class="flex justify-between text-xs text-on-surface-variant mt-1"><span>Fácil</span><span>Médio</span><span>Difícil</span></div>
       </div>
     </div>
   </div>
 </div>
 
-</div><!-- .main -->
-</div><!-- .app -->
-
-<div class="ctx" id="ctx">
-  <div class="ctx-item" onclick="edDup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Duplicar</div>
-  <hr>
-  <div class="ctx-item" onclick="edToFront()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>Trazer frente</div>
-  <div class="ctx-item" onclick="edToBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>Enviar tras</div>
-  <hr>
-  <div class="ctx-item" onclick="edDelete()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Excluir</div>
+<!-- ========== PAGE: STUDY COLLECTIONS ========== -->
+<div class="page" id="page-study_collections">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">layers</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Coleções de Estudo</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[200px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">layers</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Nenhuma coleção</h3>
+        <p class="text-sm text-on-surface-variant">Crie ou importe coleções de estudo</p>
+      </div>
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[200px] cursor-pointer hover:-translate-y-1 transition-transform border-dashed" onclick="navigateTo('deckmarketplace')">
+        <span class="material-symbols-outlined text-primary" style="font-size:48px">add</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Importar Coleção</h3>
+        <p class="text-sm text-on-surface-variant">Importe do marketplace</p>
+      </div>
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[200px] cursor-pointer hover:-translate-y-1 transition-transform border-dashed" onclick="navigateTo('card_lab')">
+        <span class="material-symbols-outlined text-primary" style="font-size:48px">add</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Criar Coleção</h3>
+        <p class="text-sm text-on-surface-variant">Gere cards no laboratório</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span id="toastMsg"></span></div>
+<!-- ========== PAGE: DECK MARKETPLACE ========== -->
+<div class="page" id="page-deckmarketplace">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-beige flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">storefront</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Marketplace de Decks</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[280px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px">storefront</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Marketplace Vazio</h3>
+        <p class="text-sm text-on-surface-variant">Nenhum deck disponível ainda</p>
+      </div>
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[280px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px">upload</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Publique seu Deck</h3>
+        <p class="text-sm text-on-surface-variant">Compartilhe com a comunidade</p>
+      </div>
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[280px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px">search</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Buscar Decks</h3>
+        <p class="text-sm text-on-surface-variant">Encontre decks por disciplina</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
+<!-- ========== PAGE: CARD LAB ========== -->
+<div class="page" id="page-card_lab">
+  <div class="max-w-3xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-[#c55a40] flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">science</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Laboratório de Cards</h1>
+    </div>
+    <div class="card rounded-2xl p-8">
+      <p class="text-lg text-on-surface-variant mb-6">Gere flashcards automaticamente a partir de materiais de estudo</p>
+      <div class="flex flex-col gap-4 mb-6">
+        <div class="border-2 border-dashed border-outline-variant rounded-xl p-8 text-center hover:border-primary transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">cloud_upload</span>
+          <p class="text-md text-on-surface-variant mt-2">Arraste arquivos aqui ou clique para selecionar</p>
+          <p class="text-xs text-on-surface-variant mt-1">Suporta .txt, .pdf, .md</p>
+        </div>
+        <textarea class="input min-h-[150px] resize-y" placeholder="Ou cole o texto aqui para gerar cards automaticamente..."></textarea>
+      </div>
+      <div class="flex gap-4">
+        <button class="btn btn-primary flex-1" onclick="showToast('Gerando cards...')">Gerar Cards</button>
+        <button class="btn btn-outline" onclick="navigateTo('memory')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ANATOMY 3D ========== -->
+<div class="page" id="page-anatomy3d">
+  <div class="max-w-6xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-blue flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">view_in_ar</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Explorador de Anatomia 3D</h1>
+    </div>
+    <div class="card rounded-2xl p-8">
+      <div class="h-[400px] bg-surface-variant/30 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-game-blue/10 to-game-purple/10"></div>
+        <div class="text-center z-10">
+          <span class="material-symbols-outlined text-on-surface-variant" style="font-size:80px">view_in_ar</span>
+          <p class="text-lg text-on-surface-variant mt-4">Modelo 3D Interativo</p>
+          <p class="text-sm text-on-surface-variant">Arraste para rotacionar · Pinça para zoom</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-3">
+        <button class="bg-game-blue text-white rounded-xl p-3 text-xs font-bold text-center hover:brightness-110 transition-all">Sistema Muscular</button>
+        <button class="bg-game-green text-white rounded-xl p-3 text-xs font-bold text-center hover:brightness-110 transition-all">Sistema Ósseo</button>
+        <button class="bg-game-purple text-white rounded-xl p-3 text-xs font-bold text-center hover:brightness-110 transition-all">Sistema Nervoso</button>
+        <button class="bg-game-orange text-white rounded-xl p-3 text-xs font-bold text-center hover:brightness-110 transition-all">Sistema Circulatório</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: EXAM COUNTDOWN ========== -->
+<div class="page" id="page-examcountdown">
+  <div class="max-w-3xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-error flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">timer</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Countdown do Exame</h1>
+    </div>
+    <div class="card rounded-2xl p-8 text-center">
+      <p class="text-lg text-on-surface-variant mb-6">Nenhum exame agendado</p>
+      <div class="flex justify-center gap-6 mb-8">
+        <div class="bg-surface-container-low rounded-xl p-6 min-w-[80px]"><p class="text-3xl font-extrabold text-on-surface-variant">--</p><p class="text-xs text-on-surface-variant">Dias</p></div>
+        <div class="bg-surface-container-low rounded-xl p-6 min-w-[80px]"><p class="text-3xl font-extrabold text-on-surface-variant">--</p><p class="text-xs text-on-surface-variant">Horas</p></div>
+        <div class="bg-surface-container-low rounded-xl p-6 min-w-[80px]"><p class="text-3xl font-extrabold text-on-surface-variant">--</p><p class="text-xs text-on-surface-variant">Min</p></div>
+      </div>
+      <button class="btn btn-primary w-full max-w-md" onclick="showToast('Configure um exame primeiro')">Agendar Exame</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: CLINICAL CASES ========== -->
+<div class="page" id="page-clinical_cases">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-green flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">local_hospital</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Simulação Clínica</h1>
+    </div>
+    <div class="card rounded-2xl p-8 mb-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant" style="font-size:32px">pets</span></div>
+        <div><h2 class="text-xl font-bold">Nenhum caso ativo</h2><p class="text-sm text-on-surface-variant">Crie um novo caso clínico para começar</p></div>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-6 mb-6 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">add_circle</span>
+        <h3 class="font-bold mt-2 mb-1">Criar Novo Caso</h3>
+        <p class="text-md text-on-surface-variant">Cadastre um paciente para iniciar a simulação</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-surface-container-low rounded-xl p-4 text-center"><p class="text-xs text-on-surface-variant uppercase mb-1">Peso</p><p class="text-xl font-bold">--</p></div>
+        <div class="bg-surface-container-low rounded-xl p-4 text-center"><p class="text-xs text-on-surface-variant uppercase mb-1">Temperatura</p><p class="text-xl font-bold">--</p></div>
+        <div class="bg-surface-container-low rounded-xl p-4 text-center"><p class="text-xs text-on-surface-variant uppercase mb-1">FC</p><p class="text-xl font-bold">--</p></div>
+        <div class="bg-surface-container-low rounded-xl p-4 text-center"><p class="text-xs text-on-surface-variant uppercase mb-1">FR</p><p class="text-xl font-bold">--</p></div>
+      </div>
+    </div>
+    <div class="flex gap-4">
+      <button class="btn btn-primary flex-1" onclick="showToast('Iniciando diagnóstico...')">Iniciar Diagnóstico</button>
+      <button class="btn btn-outline" onclick="navigateTo('dashboard')">Voltar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: EMERGENCY ========== -->
+<div class="page" id="page-emergency">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-error flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">emergency</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-error">VetER - Emergência</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="card rounded-2xl p-6 border-2 border-error/30">
+        <div class="w-14 h-14 rounded-xl bg-error flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">monitor_heart</span></div>
+        <h3 class="text-lg font-bold mb-1">Triagem Hospitalar</h3>
+        <p class="text-sm text-on-surface-variant">Avaliação em tempo real</p>
+      </div>
+      <div class="card rounded-2xl p-6 border-2 border-error/30">
+        <div class="w-14 h-14 rounded-xl bg-error flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">medication</span></div>
+        <h3 class="text-lg font-bold mb-1">Farmácia Crítica</h3>
+        <p class="text-sm text-on-surface-variant">Gestão de medicamentos</p>
+      </div>
+      <div class="card rounded-2xl p-6 border-2 border-error/30">
+        <div class="w-14 h-14 rounded-xl bg-error flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">favorite</span></div>
+        <h3 class="text-lg font-bold mb-1">RCP Guiada</h3>
+        <p class="text-sm text-on-surface-variant">Compressões guiadas</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: FORUM ========== -->
+<div class="page" id="page-forum">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-orange flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">forum</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Fórum de Discussão</h1>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div class="card rounded-xl p-8 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px">forum</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Fórum Vazio</h3>
+        <p class="text-sm text-on-surface-variant">Nenhuma discussão ainda. Seja o primeiro a postar!</p>
+        <button class="btn btn-primary mt-4" onclick="showToast('Abrir editor de post...')">Criar Primeira Discussão</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: GLOSSARY ========== -->
+<div class="page" id="page-glossary">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-tertiary flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">menu_book</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Glossário Técnico</h1>
+    </div>
+    <div class="flex flex-col gap-3">
+      <div class="card rounded-xl p-4"><h3 class="font-bold text-primary">Brucelose</h3><p class="text-sm text-on-surface-variant">Doença infecciosa bacteriana causada por <em>Brucella</em>, transmitida ao homem pelo contato com animais infectados.</p></div>
+      <div class="card rounded-xl p-4"><h3 class="font-bold text-primary">Mastite</h3><p class="text-sm text-on-surface-variant">Inflamação da glândula mamária, geralmente de origem infecciosa, comum em vacas leiteiras.</p></div>
+      <div class="card rounded-xl p-4"><h3 class="font-bold text-primary">Ivermectina</h3><p class="text-sm text-on-surface-variant">Antiparasitário que atua como agonista dos receptores GABA, causando paralisia neuromuscular em parasitas.</p></div>
+      <div class="card rounded-xl p-4"><h3 class="font-bold text-primary">Hemoglobina</h3><p class="text-sm text-on-surface-variant">Proteína presente nos eritrócitos responsável pelo transporte de oxigênio e CO2 no sangue.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: COMMUNITY LIBRARY ========== -->
+<div class="page" id="page-community_library">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">local_library</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Biblioteca Comunitária</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer">
+        <div class="h-32 bg-game-orange/20 rounded-xl mb-4 flex items-center justify-center"><span class="material-symbols-outlined text-game-orange" style="font-size:48px">science</span></div>
+        <h3 class="text-lg font-bold mb-1">Notas Clínicas Compartilhadas</h3>
+        <p class="text-sm text-on-surface-variant">Notas de aula e resumos da comunidade</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer">
+        <div class="h-32 bg-game-purple/20 rounded-xl mb-4 flex items-center justify-center"><span class="material-symbols-outlined text-game-purple" style="font-size:48px">image</span></div>
+        <h3 class="text-lg font-bold mb-1">Galeria de Exames</h3>
+        <p class="text-sm text-on-surface-variant">Imagens de exames compartilhadas</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: MENTOR HUB ========== -->
+<div class="page" id="page-mentor_hub">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-beige flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">school</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Hub de Mentoria</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[200px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">school</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Nenhum mentor disponível</h3>
+        <p class="text-sm text-on-surface-variant">Mentores poderão se cadastrar em breve</p>
+      </div>
+      <div class="card rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[200px]">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">person_add</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Seja um Mentor</h3>
+        <p class="text-sm text-on-surface-variant">Compartilhe seu conhecimento</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: MENTOR PROFILE ========== -->
+<div class="page" id="page-mentor_profile">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="card rounded-2xl p-8 mb-6">
+      <div class="flex items-center gap-6 mb-6">
+        <div class="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-4xl font-extrabold border-4 border-surface shadow-lg">?</div>
+        <div>
+          <h1 class="text-2xl font-extrabold">Mentor Indisponível</h1>
+          <p class="text-on-surface-variant">Nenhum mentor selecionado</p>
+        </div>
+      </div>
+      <p class="text-md text-on-surface-variant mb-4">Nenhum mentor disponível no momento. Volte ao Hub de Mentoria para ver quando mentores estiverem disponíveis.</p>
+      <div class="flex gap-4">
+        <button class="btn btn-outline" onclick="navigateTo('mentor_hub')">Voltar ao Hub</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: SYMPTOMS ========== -->
+<div class="page" id="page-symptoms">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-orange flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">search</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Base de Sintomas</h1>
+    </div>
+    <div class="mb-6">
+      <input class="input rounded-full" placeholder="Buscar sintomas..." type="text">
+    </div>
+    <div class="flex flex-col gap-3">
+      <div class="card rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform">
+        <div class="w-10 h-10 rounded-lg bg-error flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-sm">thermostat</span></div>
+        <div class="flex-1"><p class="font-bold">Febre</p><p class="text-xs text-on-surface-variant">Aumento da temperatura corporal acima do normal</p></div>
+      </div>
+      <div class="card rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform">
+        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-sm">sick</span></div>
+        <div class="flex-1"><p class="font-bold">Vômito</p><p class="text-xs text-on-surface-variant">Expulsão forçada do conteúdo gástrico</p></div>
+      </div>
+      <div class="card rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform">
+        <div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-sm">water_drop</span></div>
+        <div class="flex-1"><p class="font-bold">Anorexia</p><p class="text-xs text-on-surface-variant">Perda ou redução do apetite</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: CLINICAL NOTES WIKI ========== -->
+<div class="page" id="page-clinical_notes">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-blue flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">description</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Wiki de Notas Clínicas</h1>
+    </div>
+    <div class="flex flex-col gap-3">
+      <div class="card rounded-xl p-8 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">description</span>
+        <h3 class="text-lg font-bold mt-3 mb-1">Nenhuma nota clínica</h3>
+        <p class="text-sm text-on-surface-variant">Crie notas clínicas a partir de casos simulados</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: DISCOVER ========== -->
+<div class="page" id="page-discover">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-purple flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">explore</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Descobrir</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('forum')">
+        <div class="w-14 h-14 rounded-xl bg-game-orange flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">forum</span></div>
+        <h3 class="text-lg font-bold mb-1">Fórum</h3>
+        <p class="text-sm text-on-surface-variant">Discussões da comunidade</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('glossary')">
+        <div class="w-14 h-14 rounded-xl bg-game-purple flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">menu_book</span></div>
+        <h3 class="text-lg font-bold mb-1">Glossário</h3>
+        <p class="text-sm text-on-surface-variant">Termos técnicos</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('community_library')">
+        <div class="w-14 h-14 rounded-xl bg-game-green flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">local_library</span></div>
+        <h3 class="text-lg font-bold mb-1">Biblioteca</h3>
+        <p class="text-sm text-on-surface-variant">Conteúdo comunitário</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('mentor_hub')">
+        <div class="w-14 h-14 rounded-xl bg-game-beige flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">school</span></div>
+        <h3 class="text-lg font-bold mb-1">Mentores</h3>
+        <p class="text-sm text-on-surface-variant">Conexões com professores</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('symptoms')">
+        <div class="w-14 h-14 rounded-xl bg-error flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">search</span></div>
+        <h3 class="text-lg font-bold mb-1">Base de Sintomas</h3>
+        <p class="text-sm text-on-surface-variant">Referência de sinais clínicos</p>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform cursor-pointer" onclick="navigateTo('anatomy3d')">
+        <div class="w-14 h-14 rounded-xl bg-game-blue flex items-center justify-center mb-4"><span class="material-symbols-outlined text-white" style="font-size:28px">view_in_ar</span></div>
+        <h3 class="text-lg font-bold mb-1">Anatomia 3D</h3>
+        <p class="text-sm text-on-surface-variant">Modelos interativos</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: STUDY ROOMS ========== -->
+<div class="page" id="page-studyrooms">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-game-green flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">groups</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Salas de Estudo</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Sala de Anatomia</h3>
+          <span class="badge bg-surface-container-high text-on-surface-variant">0 online</span>
+        </div>
+        <p class="text-sm text-on-surface-variant mb-4">Sessão de estudo grupal sobre anatomia comparada</p>
+        <button class="btn btn-primary w-full">Entrar na Sala</button>
+      </div>
+      <div class="card rounded-2xl p-6 hover:-translate-y-1 transition-transform">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Sala de Farmacologia</h3>
+          <span class="badge bg-surface-container-high text-on-surface-variant">0 online</span>
+        </div>
+        <p class="text-sm text-on-surface-variant mb-4">Revisão de fármacos veterinários</p>
+        <button class="btn btn-primary w-full">Entrar na Sala</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ACHIEVEMENTS ========== -->
+<div class="page" id="page-achievements">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">emoji_events</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Conquistas e Bônus Diário</h1>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="card rounded-xl p-4 text-center">
+        <span class="material-symbols-outlined text-primary" style="font-size:48px;font-variation-settings:'FILL' 1">local_fire_department</span>
+        <p class="text-lg font-bold mt-2">Streak de 7 dias</p>
+        <p class="text-xs text-on-surface-variant">Bloqueado</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px;font-variation-settings:'FILL' 1">star</span>
+        <p class="text-lg font-bold mt-2">Primeira Revisão</p>
+        <p class="text-xs text-on-surface-variant">Bloqueado</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">military_tech</span>
+        <p class="text-lg font-bold mt-2">50 Cards</p>
+        <p class="text-xs text-on-surface-variant">Bloqueado</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:48px">emoji_events</span>
+        <p class="text-lg font-bold mt-2">Mestre Arena</p>
+        <p class="text-xs text-on-surface-variant">Bloqueado</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: CALENDAR ========== -->
+<div class="page" id="page-calendar">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-8">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
+        <span class="material-symbols-outlined text-white" style="font-size:32px">calendar_month</span>
+      </div>
+      <h1 class="text-3xl font-extrabold">Calendário de Estudos</h1>
+    </div>
+    <div class="card rounded-2xl p-6">
+      <div class="flex justify-between items-center mb-6">
+        <button class="text-primary"><span class="material-symbols-outlined">chevron_left</span></button>
+        <h2 class="text-xl font-bold">Julho 2026</h2>
+        <button class="text-primary"><span class="material-symbols-outlined">chevron_right</span></button>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center text-xs">
+        <div class="font-bold text-on-surface-variant p-2">Seg</div><div class="font-bold text-on-surface-variant p-2">Ter</div><div class="font-bold text-on-surface-variant p-2">Qua</div><div class="font-bold text-on-surface-variant p-2">Qui</div><div class="font-bold text-on-surface-variant p-2">Sex</div><div class="font-bold text-on-surface-variant p-2">Sáb</div><div class="font-bold text-on-surface-variant p-2">Dom</div>
+        <div class="p-2 text-on-surface-variant"></div><div class="p-2 text-on-surface-variant"></div><div class="p-2 text-on-surface-variant">1</div><div class="p-2 text-on-surface-variant">2</div><div class="p-2 text-on-surface-variant">3</div><div class="p-2 text-on-surface-variant">4</div><div class="p-2 text-on-surface-variant">5</div>
+        <div class="p-2 text-on-surface-variant">6</div><div class="p-2 text-on-surface-variant">7</div><div class="p-2 text-on-surface-variant">8</div><div class="p-2 text-on-surface-variant">9</div><div class="p-2 text-on-surface-variant">10</div><div class="p-2 text-on-surface-variant">11</div><div class="p-2 text-on-surface-variant">12</div>
+        <div class="p-2 text-on-surface-variant">13</div><div class="p-2 text-on-surface-variant">14</div><div class="p-2 text-on-surface-variant">15</div><div class="p-2 text-on-surface-variant">16</div><div class="p-2 text-on-surface-variant">17</div><div class="p-2 text-on-surface-variant">18</div><div class="p-2 text-on-surface-variant">19</div>
+        <div class="p-2 text-on-surface-variant">20</div><div class="p-2 text-on-surface-variant">21</div><div class="p-2 text-on-surface-variant">22</div><div class="p-2 text-on-surface-variant">23</div><div class="p-2 bg-primary-container text-on-primary-container rounded-full font-bold">24</div><div class="p-2 text-on-surface-variant">25</div><div class="p-2 text-on-surface-variant">26</div>
+        <div class="p-2 text-on-surface-variant">27</div><div class="p-2 text-on-surface-variant">28</div><div class="p-2 text-on-surface-variant">29</div><div class="p-2 text-on-surface-variant">30</div><div class="p-2 text-on-surface-variant">31</div><div class="p-2 text-on-surface-variant"></div><div class="p-2 text-on-surface-variant"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-item" data-page="dashboard" onclick="navigateTo('dashboard')"><span class="material-symbols-outlined" style="font-size:24px">home</span><span class="text-xs">Início</span></button>
+    <button class="bottom-nav-item" data-page="memory" onclick="navigateTo('memory')"><span class="material-symbols-outlined" style="font-size:24px">psychology</span><span class="text-xs">Memória</span></button>
+    <button class="bottom-nav-item" data-page="arena" onclick="navigateTo('arena')"><span class="material-symbols-outlined" style="font-size:24px">swords</span><span class="text-xs">Arena</span></button>
+    <button class="bottom-nav-item" data-page="social" onclick="navigateTo('social')"><span class="material-symbols-outlined" style="font-size:24px">explore</span><span class="text-xs">Descobrir</span></button>
+    <button class="bottom-nav-item" data-page="profile" onclick="navigateTo('profile')"><span class="material-symbols-outlined" style="font-size:24px">person</span><span class="text-xs">Perfil</span></button>
+  </div>
+</nav>
 
 <script>
-// ========== STATE ==========
-var state = {
-  file: null, fileName: '', analysis: null,
-  fmt: 'png', scale: 1,
-  imgs: [], pdf: null, pptx: null,
-  exporting: false, cancel: false,
-  hist: [], totalSlides: 0, totalFiles: 0
+// ===== ROUTER =====
+let currentPage = 'login';
+const pageMap = {
+  'login': 'page-login',
+  'dashboard': 'page-dashboard',
+  'memory': 'page-memory',
+  'flashcards': 'page-flashcards',
+  'arena': 'page-arena',
+  'social': 'page-social',
+  'profile': 'page-profile',
+  'analytics': 'page-analytics',
+  'memory_settings': 'page-memory_settings',
+  'study_collections': 'page-study_collections',
+  'deckmarketplace': 'page-deckmarketplace',
+  'card_lab': 'page-card_lab',
+  'anatomy3d': 'page-anatomy3d',
+  'examcountdown': 'page-examcountdown',
+  'clinical_cases': 'page-clinical_cases',
+  'emergency': 'page-emergency',
+  'forum': 'page-forum',
+  'glossary': 'page-glossary',
+  'community_library': 'page-community_library',
+  'mentor_hub': 'page-mentor_hub',
+  'mentor_profile': 'page-mentor_profile',
+  'symptoms': 'page-symptoms',
+  'clinical_notes': 'page-clinical_notes',
+  'discover': 'page-discover',
+  'studyrooms': 'page-studyrooms',
+  'achievements': 'page-achievements',
+  'calendar': 'page-calendar'
 };
 
-// ========== NAVIGATION ==========
-function go(id) {
-  var screens = document.querySelectorAll('.screen');
-  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
-  var el = document.getElementById('s-' + id);
-  if (el) el.classList.add('active');
-  var navs = document.querySelectorAll('.nav-item');
-  for (var i = 0; i < navs.length; i++) {
-    navs[i].classList.remove('active');
-    if (navs[i].textContent.trim().toLowerCase().indexOf(id) >= 0) navs[i].classList.add('active');
-  }
-  if (id === 'editor' && !E.inited) initEditor();
-}
-
-function showPaste() { go('upload'); setTimeout(function(){ switchTab('paste', document.querySelectorAll('.tab')[1]); }, 50); }
-
-function switchTab(tab, btn) {
-  var tabs = document.querySelectorAll('.tab');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-  if (btn) btn.classList.add('active');
-  var tcs = document.querySelectorAll('.tab-content');
-  for (var i = 0; i < tcs.length; i++) tcs[i].classList.remove('active');
-  document.getElementById('tc-' + tab).classList.add('active');
-}
-
-function toast(msg, type) {
-  var t = document.getElementById('toast');
-  t.className = 'toast ' + (type || 'ok');
-  document.getElementById('toastMsg').textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
-}
-
-// ========== FILE UPLOAD ==========
-document.getElementById('fileInput').addEventListener('change', function() {
-  var f = this.files[0];
-  if (f) handleFile(f);
-  this.value = '';
-});
-
-document.getElementById('batchFileInput').addEventListener('change', function() {
-  if (this.files.length > 0) handleBatch(this.files);
-  this.value = '';
-});
-
-document.getElementById('imageInput').addEventListener('change', function() {
-  var f = this.files[0];
-  if (f) {
-    var r = new FileReader();
-    r.onload = function(e) { addImage(e.target.result); };
-    r.readAsDataURL(f);
-  }
-  this.value = '';
-});
-
-// Drop zones
-var dz = document.getElementById('dropzone');
-dz.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('over'); });
-dz.addEventListener('dragleave', function() { this.classList.remove('over'); });
-dz.addEventListener('drop', function(e) { e.preventDefault(); this.classList.remove('over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-
-var bd = document.getElementById('batchDrop');
-bd.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('over'); });
-bd.addEventListener('dragleave', function() { this.classList.remove('over'); });
-bd.addEventListener('drop', function(e) { e.preventDefault(); this.classList.remove('over'); if (e.dataTransfer.files.length) handleBatch(e.dataTransfer.files); });
-
-// Paste area
-var pa = document.getElementById('pasteArea');
-pa.addEventListener('input', function() { document.getElementById('charCount').textContent = this.value.length.toLocaleString('pt-BR') + ' caracteres'; });
-
-function clearPaste() { document.getElementById('pasteArea').value = ''; document.getElementById('charCount').textContent = '0 caracteres'; }
-async function doClipboard() {
-  try { var t = await navigator.clipboard.readText(); document.getElementById('pasteArea').value = t; document.getElementById('charCount').textContent = t.length.toLocaleString('pt-BR') + ' caracteres'; toast('HTML colado'); }
-  catch(e) { toast('Use Ctrl+V para colar', 'warn'); }
-}
-function doPaste() {
-  var html = document.getElementById('pasteArea').value.trim();
-  if (!html) { toast('Cole o HTML primeiro', 'err'); return; }
-  if (html.length < 10) { toast('HTML muito curto', 'err'); return; }
-  processHTML(html, 'html-colidado.html');
-}
-
-// ========== FILE HANDLING ==========
-function handleFile(file) {
-  if (!file) return;
-  if (!file.name.match(/\.html?$/i)) { toast('Selecione um arquivo HTML', 'err'); return; }
-  toast('Lendo arquivo...');
-  var reader = new FileReader();
-  reader.onerror = function() { toast('Erro ao ler arquivo', 'err'); };
-  reader.onload = function(e) {
-    var html = e.target.result;
-    if (!html || html.length < 10) { toast('Arquivo vazio', 'err'); return; }
-    processHTML(html, file.name);
-  };
-  reader.readAsText(file);
-}
-
-function processHTML(html, name) {
-  try {
-    toast('Analisando...');
-    var analysis = analyzeHTML(html, name);
-    state.file = html;
-    state.fileName = name;
-    state.analysis = analysis;
-    renderAnalysis(analysis);
-    go('analysis');
-    toast('Arquivo analisado! ' + analysis.slideCount + ' slide(s) detectado(s)');
-  } catch(err) {
-    console.error('processHTML error:', err);
-    toast('Erro: ' + err.message, 'err');
-  }
-}
-
-// ========== HTML ANALYSIS ==========
-function analyzeHTML(html, name) {
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(html, 'text/html');
-  if (!doc || !doc.body) throw new Error('HTML invalido');
+function navigateTo(page) {
+  if (!pageMap[page]) return;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageMap[page]).classList.add('active');
   
-  var slides = detectSlides(doc);
-  var res = detectRes(doc, slides);
-  var fonts = detectFonts(doc);
-  
-  return {
-    name: name, count: slides.length, slides: slides, res: res,
-    orient: res.w === res.h ? 'Quadrado' : res.w > res.h ? 'Paisagem' : 'Retrato',
-    fonts: fonts, imgs: (doc.querySelectorAll('img') || []).length,
-    svgs: (doc.querySelectorAll('svg') || []).length,
-    hasJS: (doc.querySelectorAll('script') || []).length > 0,
-    html: html
-  };
-}
-
-function detectSlides(doc) {
-  var sels = ['.slide','[data-screen-label]','.deck-stage > section','[class*="slide"]',
-    '[class*="Slide"]','[data-slide]','.carousel-item','.swiper-slide','.splide__slide',
-    '.page','[class*="page"]'];
-  for (var i = 0; i < sels.length; i++) {
-    try { var s = doc.querySelectorAll(sels[i]); if (s.length > 0) return Array.from(s); } catch(e) {}
-  }
-  try {
-    var containers = doc.querySelectorAll('.deck-stage,.carousel,.slideshow,main,.container');
-    for (var i = 0; i < containers.length; i++) {
-      var ch = containers[i].querySelectorAll(':scope > section,:scope > div[class],:scope > article');
-      if (ch.length > 1) return Array.from(ch);
-    }
-  } catch(e) {}
-  try { var sec = doc.querySelectorAll('section'); if (sec.length > 1) return Array.from(sec); } catch(e) {}
-  try { var art = doc.querySelectorAll('article'); if (art.length > 1) return Array.from(art); } catch(e) {}
-  return [doc.body];
-}
-
-function detectRes(doc, slides) {
-  try {
-    var stage = doc.querySelector('.deck-stage,[class*="deck-stage"]');
-    if (stage) {
-      var st = stage.getAttribute('style') || '';
-      var w = st.match(/width:\s*(\d+)px/), h = st.match(/height:\s*(\d+)px/);
-      if (w && h) return {w:parseInt(w[1]),h:parseInt(h[1])};
-    }
-    if (slides[0] && slides[0].getAttribute) {
-      var st = slides[0].getAttribute('style') || '';
-      var w = st.match(/width:\s*(\d+)px/), h = st.match(/height:\s*(\d+)px/);
-      if (w && h) return {w:parseInt(w[1]),h:parseInt(h[1])};
-    }
-  } catch(e) {}
-  return {w:1080,h:1080};
-}
-
-function detectFonts(doc) {
-  var f = [];
-  try {
-    doc.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(function(l) {
-      var m = (l.getAttribute('href')||'').match(/family=([^&:]+)/g);
-      if (m) m.forEach(function(x) { f.push(x.replace('family=','').replace(/\+/g,' ')); });
-    });
-  } catch(e) {}
-  return f;
-}
-
-function renderAnalysis(a) {
-  document.getElementById('a-name').textContent = a.name;
-  document.getElementById('a-count').textContent = a.count;
-
-  var grid = document.getElementById('a-grid');
-  grid.innerHTML = '';
-  for (var i = 0; i < a.count; i++) {
-    var lbl = 'Slide ' + (i+1);
-    try { if (a.slides[i] && a.slides[i].getAttribute) lbl = a.slides[i].getAttribute('data-screen-label') || lbl; } catch(e) {}
-    grid.innerHTML += '<div class="slide-thumb" id="thumb-' + i + '" style="position:relative;background:#1A1A1E"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#6A6A74" stroke-width="1.5" style="width:24px;height:24px;animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div></div>';
-  }
-  // Add spin animation if not exists
-  if (!document.getElementById('spin-style')) {
-    var s = document.createElement('style');
-    s.id = 'spin-style';
-    s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
-  }
-
-  document.getElementById('a-info').innerHTML =
-    '<div class="info-row"><span>Resolucao</span><span>' + a.res.w + 'x' + a.res.h + '</span></div>' +
-    '<div class="info-row"><span>Orientacao</span><span>' + a.orient + '</span></div>' +
-    '<div class="info-row"><span>Fontes</span><span>' + a.fonts.length + '</span></div>' +
-    '<div class="info-row"><span>Imagens</span><span>' + a.imgs + '</span></div>' +
-    '<div class="info-row"><span>SVGs</span><span>' + a.svgs + '</span></div>' +
-    '<div class="info-row"><span>JavaScript</span><span>' + (a.hasJS ? 'Sim' : 'Nao') + '</span></div>';
-
-  // Render actual previews
-  renderThumbnails(a);
-}
-
-async function renderThumbnails(a) {
-  var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-
-  // Single container for all thumbnails
-  var stage = document.createElement('div');
-  stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
-  document.body.appendChild(stage);
-  stage.innerHTML = clean;
-
-  // Wait for content to render
-  await new Promise(function(r) { setTimeout(r, 2500); });
-  stage.offsetHeight;
-
-  var liveSlides = detectSlidesIn(stage);
-  console.log('[Thumbs] Found', liveSlides.length, 'slides for', a.count, 'thumbnails');
-
-  for (var i = 0; i < a.count; i++) {
-    var thumb = document.getElementById('thumb-' + i);
-    if (!thumb) continue;
-
-    // Hide ALL slides first
-    for (var j = 0; j < liveSlides.length; j++) {
-      liveSlides[j].style.setProperty('display', 'none', 'important');
-    }
-
-    // Show ONLY the target slide
-    var slideEl = liveSlides[i] || stage;
-    slideEl.style.setProperty('display', 'flex', 'important');
-    slideEl.style.width = a.res.w + 'px';
-    slideEl.style.height = a.res.h + 'px';
-    slideEl.style.position = 'relative';
-    slideEl.style.overflow = 'hidden';
-
-    // Force reflow
-    void slideEl.offsetHeight;
-
-    try {
-      if (typeof html2canvas !== 'undefined') {
-        var canvas = await html2canvas(slideEl, {
-          width: a.res.w, height: a.res.h, scale: 0.4,
-          useCORS: true, allowTaint: true,
-          backgroundColor: '#ffffff', logging: false
-        });
-        var dataUrl = canvas.toDataURL('image/png');
-        thumb.style.backgroundImage = 'url(' + dataUrl + ')';
-        thumb.style.backgroundSize = 'cover';
-        thumb.style.backgroundPosition = 'center';
-        thumb.innerHTML = '<div style="position:absolute;bottom:4px;left:4px;right:4px;text-align:center;font-size:10px;font-weight:600;color:#fff;background:rgba(0,0,0,.6);border-radius:4px;padding:3px 6px">Slide ' + (i+1) + '</div>';
-        console.log('[Thumbs] Slide', i+1, 'rendered OK');
-      } else {
-        thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
-      }
-    } catch(e) {
-      console.warn('[Thumbs] Slide', i+1, 'error:', e);
-      thumb.innerHTML = '<div class="slide-num">' + String(i+1).padStart(2,'0') + '</div><div class="slide-lbl">Slide ' + (i+1) + '</div>';
-    }
-  }
-
-  // Restore all slides visibility (cleanup)
-  for (var j = 0; j < liveSlides.length; j++) {
-    liveSlides[j].style.removeProperty('display');
-  }
-  document.body.removeChild(stage);
-}
-
-// ========== FORMAT / SCALE SELECTION ==========
-document.getElementById('fmtRow').addEventListener('click', function(e) {
-  var el = e.target.closest('.fmt');
-  if (!el) return;
-  var all = this.querySelectorAll('.fmt');
-  for (var i = 0; i < all.length; i++) all[i].classList.remove('sel');
-  el.classList.add('sel');
-  state.fmt = el.dataset.f;
-});
-
-document.getElementById('scaleRow').addEventListener('click', function(e) {
-  var el = e.target.closest('.scale');
-  if (!el) return;
-  var all = this.querySelectorAll('.scale');
-  for (var i = 0; i < all.length; i++) all[i].classList.remove('sel');
-  el.classList.add('sel');
-  state.scale = parseInt(el.dataset.s);
-});
-
-// ========== EDITOR ==========
-var E = { inited:false, canvas:null, els:[], sel:null, tool:'select', zoom:1, grid:false, snap:true, undoS:[], redoS:[], nextId:1, w:1080, h:1080, bg:'#ffffff', bgImg:'', dragging:false, resizing:false, rHandle:null, dStart:{x:0,y:0}, eStart:{x:0,y:0,w:0,h:0}, slides:[], currentSlide:0 };
-
-function initEditor() {
-  E.canvas = document.getElementById('edCanvas');
-  E.canvas.style.width = E.w + 'px';
-  E.canvas.style.height = E.h + 'px';
-  E.canvas.style.background = E.bg;
-  document.getElementById('edW').value = E.w;
-  document.getElementById('edH').value = E.h;
-  document.getElementById('edBg').value = E.bg;
-  
-  E.canvas.addEventListener('mousedown', edMouseDown);
-  document.addEventListener('mousemove', edMouseMove);
-  document.addEventListener('mouseup', edMouseUp);
-  E.canvas.addEventListener('dblclick', edDblClick);
-  E.canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); showCtx(e); });
-  document.addEventListener('click', function(e) { if (!e.target.closest('.ctx')) hideCtx(); });
-  document.addEventListener('keydown', edKey);
-  
-  E.inited = true;
-  edRender();
-}
-
-function setTool(t) {
-  E.tool = t;
-  var tools = document.querySelectorAll('.ed-tool[data-t]');
-  for (var i = 0; i < tools.length; i++) tools[i].classList.toggle('active', tools[i].dataset.t === t);
-  E.canvas.style.cursor = t === 'select' ? 'default' : t === 'hand' ? 'grab' : 'crosshair';
-}
-
-function edMouseDown(e) {
-  var r = E.canvas.getBoundingClientRect();
-  var x = (e.clientX - r.left) / E.zoom, y = (e.clientY - r.top) / E.zoom;
-  
-  if (E.tool === 'hand') { E.dragging = true; E.dStart = {x:e.clientX,y:e.clientY}; E.canvas.style.cursor = 'grabbing'; return; }
-  
-  if (E.tool === 'select') {
-    var h = getHandle(e, x, y);
-    if (h) { E.resizing = true; E.rHandle = h; E.dStart = {x,y}; E.eStart = {...E.sel}; return; }
-    var el = getElAt(x, y);
-    if (el) { selEl(el); E.dragging = true; E.dStart = {x,y}; E.eStart = {x:el.x,y:el.y}; }
-    else { selEl(null); }
-    return;
-  }
-  
-  if (['text','rect','circle'].indexOf(E.tool) >= 0) {
-    edSaveUndo();
-    var el = mkEl(E.tool, x, y);
-    E.els.push(el);
-    selEl(el);
-    edRender();
-    setTool('select');
-  }
-  if (E.tool === 'image') document.getElementById('imageInput').click();
-}
-
-function edMouseMove(e) {
-  if (E.dragging && E.tool === 'hand') {
-    var w = document.getElementById('edWrap');
-    w.scrollLeft -= e.movementX; w.scrollTop -= e.movementY;
-    return;
-  }
-  if (E.dragging && E.sel) {
-    var r = E.canvas.getBoundingClientRect();
-    var x = (e.clientX - r.left) / E.zoom, y = (e.clientY - r.top) / E.zoom;
-    E.sel.x = E.eStart.x + (x - E.dStart.x);
-    E.sel.y = E.eStart.y + (y - E.dStart.y);
-    if (E.snap) { E.sel.x = Math.round(E.sel.x/10)*10; E.sel.y = Math.round(E.sel.y/10)*10; }
-    edRender(); edProps();
-  }
-  if (E.resizing && E.sel) {
-    var r = E.canvas.getBoundingClientRect();
-    var x = (e.clientX - r.left) / E.zoom, y = (e.clientY - r.top) / E.zoom;
-    var dx = x - E.dStart.x, dy = y - E.dStart.y;
-    if (E.rHandle.indexOf('r')>=0) E.sel.w = Math.max(10, E.eStart.w + dx);
-    if (E.rHandle.indexOf('l')>=0) { E.sel.x = E.eStart.x + dx; E.sel.w = Math.max(10, E.eStart.w - dx); }
-    if (E.rHandle.indexOf('b')>=0) E.sel.h = Math.max(10, E.eStart.h + dy);
-    if (E.rHandle.indexOf('t')>=0) { E.sel.y = E.eStart.y + dy; E.sel.h = Math.max(10, E.eStart.h - dy); }
-    edRender(); edProps();
-  }
-}
-
-function edMouseUp() { if (E.dragging || E.resizing) edSaveUndo(); E.dragging = false; E.resizing = false; if (E.tool === 'hand') E.canvas.style.cursor = 'grab'; }
-
-function edDblClick() { if (E.sel && E.sel.type === 'text') edEditText(E.sel); }
-
-function edKey(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); edDelete(); }
-  if (e.ctrlKey && e.key === 'z') { e.preventDefault(); edUndo(); }
-  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); edRedo(); }
-  if (E.sel && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.key) >= 0) {
-    e.preventDefault(); edSaveUndo();
-    var s = e.shiftKey ? 10 : 1;
-    if (e.key === 'ArrowUp') E.sel.y -= s;
-    if (e.key === 'ArrowDown') E.sel.y += s;
-    if (e.key === 'ArrowLeft') E.sel.x -= s;
-    if (e.key === 'ArrowRight') E.sel.x += s;
-    edRender(); edProps();
-  }
-}
-
-function mkEl(type, x, y) {
-  var base = {id: E.nextId++, x:x, y:y, rot:0, opacity:1, locked:false, visible:true};
-  if (type === 'text') return Object.assign(base, {type:'text', w:200, h:40, text:'Texto', fontSize:24, fontFamily:'Inter', fontWeight:'400', color:'#000000', align:'left'});
-  if (type === 'rect') return Object.assign(base, {type:'rect', w:200, h:150, fill:'#CC1A1A', stroke:'transparent', strokeWidth:0, radius:0});
-  if (type === 'circle') return Object.assign(base, {type:'circle', w:150, h:150, fill:'#1A3A7A', stroke:'transparent', strokeWidth:0});
-  if (type === 'image') return Object.assign(base, {type:'image', w:200, h:200, src:''});
-  return base;
-}
-
-function getElAt(x, y) {
-  for (var i = E.els.length-1; i >= 0; i--) {
-    var el = E.els[i];
-    if (!el.visible || el.locked) continue;
-    if (x >= el.x && x <= el.x+el.w && y >= el.y && y <= el.y+el.h) return el;
-  }
-  return null;
-}
-
-function getHandle(e, x, y) {
-  if (!E.sel) return null;
-  var el = E.sel, hs = 8/E.zoom;
-  var handles = ['tl','tr','bl','br','t','b','l','r'];
-  var pos = {tl:{x:el.x,y:el.y},tr:{x:el.x+el.w,y:el.y},bl:{x:el.x,y:el.y+el.h},br:{x:el.x+el.w,y:el.y+el.h},t:{x:el.x+el.w/2,y:el.y},b:{x:el.x+el.w/2,y:el.y+el.h},l:{x:el.x,y:el.y+el.h/2},r:{x:el.x+el.w,y:el.y+el.h/2}};
-  for (var i = 0; i < handles.length; i++) {
-    var p = pos[handles[i]];
-    if (Math.abs(x-p.x) < hs && Math.abs(y-p.y) < hs) return handles[i];
-  }
-  return null;
-}
-
-function selEl(el) { E.sel = el; edRender(); edProps(); edLayers(); }
-
-function edRender() {
-  if (!E.canvas) return;
-  E.canvas.innerHTML = '';
-  
-  if (E.grid) {
-    var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;opacity:.15';
-    svg.setAttribute('width', E.w); svg.setAttribute('height', E.h);
-    for (var x = 0; x <= E.w; x += 10) {
-      var l = document.createElementNS('http://www.w3.org/2000/svg','line');
-      l.setAttribute('x1',x); l.setAttribute('y1',0); l.setAttribute('x2',x); l.setAttribute('y2',E.h);
-      l.setAttribute('stroke','#6A6A74'); l.setAttribute('stroke-width','0.5');
-      svg.appendChild(l);
-    }
-    for (var y = 0; y <= E.h; y += 10) {
-      var l = document.createElementNS('http://www.w3.org/2000/svg','line');
-      l.setAttribute('x1',0); l.setAttribute('y1',y); l.setAttribute('x2',E.w); l.setAttribute('y2',y);
-      l.setAttribute('stroke','#6A6A74'); l.setAttribute('stroke-width','0.5');
-      svg.appendChild(l);
-    }
-    E.canvas.appendChild(svg);
-  }
-  
-  for (var i = 0; i < E.els.length; i++) {
-    var el = E.els[i];
-    if (!el.visible) continue;
-    var d = document.createElement('div');
-    d.className = 'ed-el' + (el === E.sel ? ' sel' : '');
-    d.style.cssText = 'left:' + el.x + 'px;top:' + el.y + 'px;width:' + el.w + 'px;height:' + el.h + 'px;opacity:' + el.opacity + ';transform:rotate(' + el.rot + 'deg);';
-    
-    if (el.type === 'text') {
-      d.style.cssText += 'font-size:' + el.fontSize + 'px;font-family:' + el.fontFamily + ';font-weight:' + el.fontWeight + ';color:' + el.color + ';text-align:' + el.align + ';display:flex;align-items:center;padding:4px 8px;word-break:break-word;';
-      d.textContent = el.text;
-    } else if (el.type === 'rect') {
-      d.style.cssText += 'background:' + el.fill + ';border:' + el.strokeWidth + 'px solid ' + el.stroke + ';border-radius:' + el.radius + 'px;';
-    } else if (el.type === 'circle') {
-      d.style.cssText += 'background:' + el.fill + ';border:' + el.strokeWidth + 'px solid ' + el.stroke + ';border-radius:50%;';
-    } else if (el.type === 'image' && el.src) {
-      d.style.cssText += 'background-image:url(' + el.src + ');background-size:cover;background-position:center;';
-    }
-    
-    if (el === E.sel) {
-      ['tl','tr','bl','br','t','b','l','r'].forEach(function(h) {
-        var hd = document.createElement('div');
-        hd.className = 'ed-handle';
-        var pos = {top:'',left:'',right:'',bottom:'',transform:''};
-        if (h.indexOf('t')>=0) pos.top = '-3px';
-        if (h.indexOf('b')>=0) pos.bottom = '-3px';
-        if (h.indexOf('l')>=0) pos.left = '-3px';
-        if (h.indexOf('r')>=0) pos.right = '-3px';
-        if (h === 't') { pos.top = '-3px'; pos.left = '50%'; pos.transform = 'translateX(-50%)'; }
-        if (h === 'b') { pos.bottom = '-3px'; pos.left = '50%'; pos.transform = 'translateX(-50%)'; }
-        if (h === 'l') { pos.left = '-3px'; pos.top = '50%'; pos.transform = 'translateY(-50%)'; }
-        if (h === 'r') { pos.right = '-3px'; pos.top = '50%'; pos.transform = 'translateY(-50%)'; }
-        hd.style.cssText = 'top:' + pos.top + ';left:' + pos.left + ';right:' + pos.right + ';bottom:' + pos.bottom + ';transform:' + pos.transform;
-        d.appendChild(hd);
-      });
-    }
-    E.canvas.appendChild(d);
-  }
-}
-
-function edProps() {
-  var c = document.getElementById('edProps');
-  var el = E.sel;
-  if (!el) { c.innerHTML = '<div style="text-align:center;padding:16px;color:#6A6A74;font-size:11px">Selecione um elemento</div>'; return; }
-  var h = '<div class="pr"><label>X</label><input type="number" value="' + Math.round(el.x) + '" onchange="updProp(\'x\',+this.value)"><label>Y</label><input type="number" value="' + Math.round(el.y) + '" onchange="updProp(\'y\',+this.value)"></div>';
-  h += '<div class="pr"><label>W</label><input type="number" value="' + Math.round(el.w) + '" onchange="updProp(\'w\',+this.value)"><label>H</label><input type="number" value="' + Math.round(el.h) + '" onchange="updProp(\'h\',+this.value)"></div>';
-  h += '<div class="pr"><label>Op</label><input type="range" min="0" max="1" step="0.05" value="' + el.opacity + '" onchange="updProp(\'opacity\',+this.value)"></div>';
-  if (el.type === 'text') {
-    h += '<div class="pr"><label>Cor</label><input type="color" value="' + el.color + '" onchange="updProp(\'color\',this.value)"><label>Tam</label><input type="number" value="' + el.fontSize + '" onchange="updProp(\'fontSize\',+this.value)"></div>';
-  }
-  if (el.type === 'rect' || el.type === 'circle') {
-    h += '<div class="pr"><label>Fill</label><input type="color" value="' + el.fill + '" onchange="updProp(\'fill\',this.value)"></div>';
-  }
-  c.innerHTML = h;
-}
-
-function updProp(p, v) { if (!E.sel) return; edSaveUndo(); E.sel[p] = v; edRender(); edProps(); }
-
-function edLayers() {
-  var c = document.getElementById('edLayers');
-  c.innerHTML = '';
-  for (var i = E.els.length-1; i >= 0; i--) {
-    var el = E.els[i];
-    var d = document.createElement('div');
-    d.className = 'layer' + (el === E.sel ? ' active' : '');
-    d.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>' + (el.type === 'text' ? el.text.substring(0,15) : el.type) + ' #' + el.id;
-    d.onclick = (function(e) { return function() { selEl(e); }; })(el);
-    c.appendChild(d);
-  }
-}
-
-function edEditText(el) {
-  var inp = document.createElement('textarea');
-  inp.style.cssText = 'position:absolute;left:' + el.x + 'px;top:' + el.y + 'px;width:' + el.w + 'px;height:' + el.h + 'px;font-size:' + el.fontSize + 'px;font-family:' + el.fontFamily + ';color:' + el.color + ';background:transparent;border:2px solid #CC1A1A;outline:none;padding:4px 8px;z-index:20;';
-  inp.value = el.text;
-  E.canvas.appendChild(inp);
-  inp.focus(); inp.select();
-  var done = function() { edSaveUndo(); el.text = inp.value; inp.remove(); edRender(); edProps(); edLayers(); };
-  inp.addEventListener('blur', done);
-  inp.addEventListener('keydown', function(e) { if (e.key === 'Escape') done(); });
-}
-
-function edDelete() { if (!E.sel) return; edSaveUndo(); E.els = E.els.filter(function(e){return e!==E.sel}); E.sel = null; edRender(); edProps(); edLayers(); }
-function edDup() { if (!E.sel) return; edSaveUndo(); var c = Object.assign({}, E.sel, {id:E.nextId++, x:E.sel.x+20, y:E.sel.y+20}); E.els.push(c); selEl(c); edRender(); hideCtx(); }
-function edToFront() { if (!E.sel) return; edSaveUndo(); E.els = E.els.filter(function(e){return e!==E.sel}); E.els.push(E.sel); edRender(); edLayers(); hideCtx(); }
-function edToBack() { if (!E.sel) return; edSaveUndo(); E.els = E.els.filter(function(e){return e!==E.sel}); E.els.unshift(E.sel); edRender(); edLayers(); hideCtx(); }
-
-function edSaveUndo() { E.undoS.push(JSON.stringify(E.els)); E.redoS = []; if (E.undoS.length > 50) E.undoS.shift(); }
-function edUndo() { if (!E.undoS.length) return; E.redoS.push(JSON.stringify(E.els)); E.els = JSON.parse(E.undoS.pop()); E.sel = null; edRender(); edProps(); edLayers(); }
-function edRedo() { if (!E.redoS.length) return; E.undoS.push(JSON.stringify(E.els)); E.els = JSON.parse(E.redoS.pop()); E.sel = null; edRender(); edProps(); edLayers(); }
-
-function edToggleGrid() { E.grid = !E.grid; edRender(); }
-function edResize() { E.w = parseInt(document.getElementById('edW').value)||1080; E.h = parseInt(document.getElementById('edH').value)||1080; E.canvas.style.width = E.w+'px'; E.canvas.style.height = E.h+'px'; }
-function showCtx(e) { var m = document.getElementById('ctx'); m.style.left = e.clientX+'px'; m.style.top = e.clientY+'px'; m.classList.add('show'); }
-function hideCtx() { document.getElementById('ctx').classList.remove('show'); }
-
-function setBgImage(input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    E.bgImg = e.target.result;
-    E.canvas.style.backgroundImage = 'url(' + E.bgImg + ')';
-    E.canvas.style.backgroundSize = 'cover';
-    E.canvas.style.backgroundPosition = 'center';
-    E.canvas.style.backgroundRepeat = 'no-repeat';
-    toast('Imagem de fundo aplicada');
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-function addImage(src) {
-  var img = new Image();
-  img.onload = function() {
-    edSaveUndo();
-    var el = mkEl('image', 100, 100);
-    el.src = src;
-    var ratio = img.naturalWidth / img.naturalHeight;
-    el.w = 300; el.h = 300/ratio;
-    E.els.push(el); selEl(el); edRender();
-  };
-  img.src = src;
-}
-
-// ========== EXPORT ==========
-function getFmt() { return state.fmt; }
-function getScale() { return state.scale; }
-function getQual() { return parseFloat(document.getElementById('qual').value || '1'); }
-
-async function doExport() {
-  var a = state.analysis;
-  if (!a) { toast('Nenhum arquivo analisado', 'err'); return; }
-  if (state.exporting) return;
-  state.exporting = true; state.cancel = false; state.imgs = []; state.pdf = null; state.pptx = null;
-
-  var fmt = getFmt(), scale = getScale(), qual = getQual();
-
-  document.getElementById('p-name').textContent = a.name;
-  document.getElementById('p-scale').textContent = scale + 'x';
-  document.getElementById('p-fmt').textContent = fmt.toUpperCase() + ' ' + (a.res.w*scale) + 'x' + (a.res.h*scale);
-  document.getElementById('pct').textContent = '0%';
-  document.getElementById('bar').style.width = '0%';
-  document.getElementById('p-detail').textContent = 'Preparando...';
-
-  var sg = document.getElementById('sp-grid');
-  sg.innerHTML = '';
-  for (var i = 0; i < a.count; i++) sg.innerHTML += '<div class="sp-item" id="sp' + i + '"><div class="sp-dot"></div><div class="n">' + String(i+1).padStart(2,'0') + '</div></div>';
-
-  go('progress');
-  var t0 = Date.now();
-
-  // Render slides using a visible staging container (not iframe)
-  var container = document.createElement('div');
-  container.id = 'export-stage';
-  container.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
-  document.body.appendChild(container);
-
-  // Strip scripts and inject HTML
-  var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  container.innerHTML = clean;
-
-  // Wait for rendering
-  document.getElementById('p-detail').textContent = 'Carregando conteudo...';
-  await new Promise(function(r) { setTimeout(r, 2500); });
-
-  // Force layout
-  container.offsetHeight;
-
-  // Find slides INSIDE the container (re-query with same selectors)
-  var liveSlides = detectSlidesIn(container);
-
-  for (var i = 0; i < a.count; i++) {
-    if (state.cancel) break;
-    var sp = document.getElementById('sp' + i);
-    if (sp) sp.classList.add('active');
-    document.getElementById('p-detail').textContent = 'Renderizando slide ' + (i+1) + ' de ' + a.count + '...';
-
-    try {
-      var slideEl = liveSlides[i] || container;
-      var blob = await renderSlideEl(slideEl, a.res, scale, fmt, qual);
-      state.imgs.push({name:'Slide-' + String(i+1).padStart(2,'0') + '.' + fmt, blob:blob, idx:i});
-      if (sp) { sp.classList.remove('active'); sp.classList.add('done'); }
-      document.getElementById('p-slides').textContent = i+1;
-      var pct = Math.round(((i+1)/a.count)*100);
-      document.getElementById('pct').textContent = pct + '%';
-      document.getElementById('bar').style.width = pct + '%';
-      var elapsed = Date.now() - t0;
-      var rem = Math.round((elapsed/(i+1) * (a.count-i-1))/1000);
-      document.getElementById('p-time').textContent = String(Math.floor(rem/60)).padStart(2,'0') + ':' + String(rem%60).padStart(2,'0');
-    } catch(err) { console.error('Slide', i, 'error:', err); if (sp) { sp.classList.remove('active'); sp.classList.add('done'); } }
-  }
-
-  // Cleanup staging container
-  document.body.removeChild(container);
-
-  if (!state.cancel && state.imgs.length > 0) {
-    // PDF
-    if (fmt === 'pdf' && typeof jspdf !== 'undefined') {
-      try {
-        var pw = a.res.w * scale * 0.75, ph = a.res.h * scale * 0.75;
-        var orient = a.res.w >= a.res.h ? 'landscape' : 'portrait';
-        var pdf = new jspdf.jsPDF({orientation:orient, unit:'pt', format:[pw,ph]});
-        for (var i = 0; i < state.imgs.length; i++) {
-          if (i > 0) pdf.addPage();
-          var du = await blobToDataUrl(state.imgs[i].blob);
-          pdf.addImage(du, 'PNG', 0, 0, pw, ph);
-        }
-        state.pdf = pdf.output('blob');
-      } catch(e) { console.error('PDF error:', e); }
-    }
-    // PPTX
-    if ((fmt === 'pptx' || fmt === 'canva') && typeof PptxGenJS !== 'undefined') {
-      try {
-        var pptx = new PptxGenJS();
-        pptx.defineLayout({name:'C', width:a.res.w/96, height:a.res.h/96});
-        pptx.layout = 'C';
-        for (var i = 0; i < state.imgs.length; i++) {
-          var sl = pptx.addSlide();
-          var du = await blobToDataUrl(state.imgs[i].blob);
-          sl.addImage({data:du, x:0, y:0, w:a.res.w/96, h:a.res.h/96});
-        }
-        state.pptx = await pptx.write({outputType:'blob'});
-      } catch(e) { console.error('PPTX error:', e); }
-    }
-
-    state.totalSlides += a.count; state.totalFiles++;
-    state.hist.unshift({name:a.name, slides:a.count, fmt:fmt.toUpperCase(), scale:scale+'x', date:new Date().toLocaleString('pt-BR')});
-    saveStats(); updateDash(); renderComplete();
-    go('complete');
-    toast('Exportacao concluida! ' + state.imgs.length + ' slide(s)');
-  } else if (state.imgs.length === 0) {
-    toast('Nenhum slide exportado - tente outro arquivo', 'err');
-    go('analysis');
-  }
-  state.exporting = false;
-}
-
-function detectSlidesIn(container) {
-  var sels = ['.slide','[data-screen-label]','.deck-stage > section','[class*="slide"]',
-    '[class*="Slide"]','[data-slide]','.carousel-item','.swiper-slide','.page','[class*="page"]'];
-  for (var i = 0; i < sels.length; i++) {
-    try { var s = container.querySelectorAll(sels[i]); if (s.length > 0) return Array.from(s); } catch(e) {}
-  }
-  try {
-    var sec = container.querySelectorAll('section');
-    if (sec.length > 1) return Array.from(sec);
-  } catch(e) {}
-  try {
-    var arts = container.querySelectorAll('article');
-    if (arts.length > 1) return Array.from(arts);
-  } catch(e) {}
-  // Fallback: direct children
-  var kids = [];
-  for (var i = 0; i < container.children.length; i++) {
-    var ch = container.children[i];
-    if (ch.tagName === 'DIV' || ch.tagName === 'SECTION' || ch.tagName === 'ARTICLE') kids.push(ch);
-  }
-  if (kids.length > 1) return kids;
-  return [container];
-}
-
-async function renderSlideEl(el, res, scale, fmt, qual) {
-  // Prepare element for capture
-  el.style.display = 'flex';
-  el.style.width = res.w + 'px';
-  el.style.height = res.h + 'px';
-  el.style.position = 'relative';
-  el.style.overflow = 'hidden';
-
-  // Hide sibling slides
-  var parent = el.parentElement;
-  if (parent) {
-    for (var i = 0; i < parent.children.length; i++) {
-      if (parent.children[i] !== el) parent.children[i].style.display = 'none';
-    }
-  }
-
-  // Force reflow
-  el.offsetHeight;
-
-  // Method 1: html2canvas
-  if (typeof html2canvas !== 'undefined') {
-    try {
-      var canvas = await html2canvas(el, {
-        width: res.w, height: res.h, scale: scale,
-        useCORS: true, allowTaint: true,
-        backgroundColor: '#ffffff', logging: false,
-        removeContainer: true, foreignObjectRendering: false
-      });
-      var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
-      return new Promise(function(resolve, reject) {
-        canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('toBlob failed')); }, mime, qual);
-      });
-    } catch(e) { console.warn('html2canvas error, using SVG fallback:', e); }
-  }
-
-  // Method 2: SVG foreignObject
-  var canvas = document.createElement('canvas');
-  var w = res.w * scale, h = res.h * scale;
-  canvas.width = w; canvas.height = h;
-  var ctx = canvas.getContext('2d');
-
-  // Collect all styles
-  var allStyles = '';
-  document.querySelectorAll('style').forEach(function(s) { allStyles += s.textContent; });
-
-  var clone = el.cloneNode(true);
-  clone.style.cssText = 'position:absolute;inset:0;width:' + res.w + 'px;height:' + res.h + 'px;display:flex;';
-
-  var wrapper = document.createElement('div');
-  wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-  wrapper.style.cssText = 'width:' + res.w + 'px;height:' + res.h + 'px;position:relative;overflow:hidden;background:#fff;';
-  var styleEl = document.createElement('style');
-  styleEl.textContent = '*{box-sizing:border-box;margin:0;padding:0}' + allStyles;
-  wrapper.appendChild(styleEl);
-  wrapper.appendChild(clone);
-
-  var svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + res.w + ' ' + res.h + '">' +
-    '<foreignObject width="' + res.w + '" height="' + res.h + '">' +
-    new XMLSerializer().serializeToString(wrapper) +
-    '</foreignObject></svg>';
-
-  var svgBlob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
-  var svgUrl = URL.createObjectURL(svgBlob);
-
-  return new Promise(function(resolve, reject) {
-    var img = new Image();
-    img.onload = function() {
-      ctx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(svgUrl);
-      var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
-      canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('toBlob failed')); }, mime, qual);
-    };
-    img.onerror = function() { URL.revokeObjectURL(svgUrl); reject(new Error('SVG render failed')); };
-    img.src = svgUrl;
+  // Update bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.page === page) btn.classList.add('active');
   });
-}
-
-function blobToDataUrl(blob) {
-  return new Promise(function(r) { var reader = new FileReader(); reader.onload = function(e) { r(e.target.result); }; reader.readAsDataURL(blob); });
-}
-
-function renderComplete() {
-  var c = state.imgs.length, fmt = getFmt(), scale = getScale(), name = state.analysis ? state.analysis.name : 'Editor';
-  document.getElementById('c-name').textContent = name;
-  document.getElementById('c-summary').textContent = c + ' slide(s) exportado(s) em ' + fmt.toUpperCase() + ' (' + scale + 'x)';
-  document.getElementById('c-stats').innerHTML =
-    '<div class="stat"><div class="stat-val" style="font-size:18px">' + c + '</div><div class="stat-lbl">Slides</div></div>' +
-    '<div class="stat"><div class="stat-val" style="font-size:18px">' + fmt.toUpperCase() + '</div><div class="stat-lbl">Formato</div></div>' +
-    '<div class="stat"><div class="stat-val" style="font-size:18px">' + scale + 'x</div><div class="stat-lbl">Escala</div></div>' +
-    '<div class="stat"><div class="stat-val" style="font-size:18px">' + ((state.analysis?state.analysis.res.w:E.w)*scale) + 'x' + ((state.analysis?state.analysis.res.h:E.h)*scale) + '</div><div class="stat-lbl">Resolucao</div></div>';
   
-  var btns = document.getElementById('c-btns');
-  btns.innerHTML = '';
-  if (['png','jpg','webp'].indexOf(fmt) >= 0) btns.innerHTML += '<button class="btn-primary" style="width:auto;padding:12px 24px" onclick="dlImages()">Baixar Imagens</button>';
-  if (fmt === 'pdf' && state.pdf) btns.innerHTML += '<button class="btn-primary" style="width:auto;padding:12px 24px" onclick="dlPDF()">Baixar PDF</button>';
-  if ((fmt === 'pptx' || fmt === 'canva') && state.pptx) btns.innerHTML += '<button class="btn-primary" style="width:auto;padding:12px 24px" onclick="dlPPTX()">Baixar PPTX</button>';
-}
-
-function dlImages() { state.imgs.forEach(function(img, i) { setTimeout(function() { dl(img.blob, img.name); }, i*200); }); toast(state.imgs.length + ' imagens baixadas'); }
-function dlPDF() { if (state.pdf) { dl(state.pdf, state.fileName.replace(/\.html?$/i,'') + '.pdf'); toast('PDF baixado'); } }
-function dlPPTX() { if (state.pptx) { dl(state.pptx, state.fileName.replace(/\.html?$/i,'') + '.pptx'); toast('PPTX baixado'); } }
-function dl(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-function cancelExport() { state.cancel = true; state.exporting = false; go('dash'); toast('Cancelado', 'warn'); }
-
-async function openEditor() {
-  go('editor');
-  if (!E.inited) initEditor();
-
-  var a = state.analysis;
-  if (!a) { toast('Nenhum arquivo para editar', 'err'); return; }
-
-  // Set canvas to match file resolution
-  E.w = a.res.w;
-  E.h = a.res.h;
-  document.getElementById('edW').value = E.w;
-  document.getElementById('edH').value = E.h;
-  E.canvas.style.width = E.w + 'px';
-  E.canvas.style.height = E.h + 'px';
-  E.bg = '#ffffff';
-  E.canvas.style.background = '#ffffff';
-  document.getElementById('edBg').value = '#ffffff';
-  E.slides = [];
-  E.currentSlide = 0;
-
-  toast('Carregando todas as slides...');
-
-  // Render ALL slides as background images
-  try {
-    var clean = a.html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-
-    // Create staging container
-    var stage = document.createElement('div');
-    stage.style.cssText = 'position:fixed;left:0;top:0;width:' + a.res.w + 'px;height:' + a.res.h + 'px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff;';
-    document.body.appendChild(stage);
-    stage.innerHTML = clean;
-
-    await new Promise(function(r) { setTimeout(r, 2500); });
-    stage.offsetHeight;
-
-    var liveSlides = detectSlidesIn(stage);
-    console.log('[Editor] Found', liveSlides.length, 'slides');
-
-    for (var i = 0; i < liveSlides.length; i++) {
-      // Hide all slides
-      for (var j = 0; j < liveSlides.length; j++) {
-        liveSlides[j].style.setProperty('display', 'none', 'important');
-      }
-      // Show only target
-      liveSlides[i].style.setProperty('display', 'flex', 'important');
-      liveSlides[i].style.width = a.res.w + 'px';
-      liveSlides[i].style.height = a.res.h + 'px';
-      void liveSlides[i].offsetHeight;
-
-      var bgSrc = '';
-      if (typeof html2canvas !== 'undefined') {
-        try {
-          var canvas = await html2canvas(liveSlides[i], {
-            width: a.res.w, height: a.res.h, scale: 1,
-            useCORS: true, allowTaint: true,
-            backgroundColor: '#ffffff', logging: false
-          });
-          bgSrc = canvas.toDataURL('image/png');
-          console.log('[Editor] Slide', i+1, 'rendered');
-        } catch(e) { console.warn('[Editor] Slide', i+1, 'error:', e); }
-      }
-
-      E.slides.push({ bg: bgSrc, els: [], nextId: 1 });
-      toast('Slide ' + (i+1) + '/' + liveSlides.length + ' carregada');
-    }
-
-    // Restore visibility
-    for (var j = 0; j < liveSlides.length; j++) {
-      liveSlides[j].style.removeProperty('display');
-    }
-    document.body.removeChild(stage);
-  } catch(e) {
-    console.warn('Editor load error:', e);
-    try { document.body.removeChild(stage); } catch(x) {}
-    E.slides.push({ bg: '', els: [], nextId: 1 });
-  }
-
-  // If no slides found, add a blank one
-  if (E.slides.length === 0) E.slides.push({ bg: '', els: [], nextId: 1 });
-
-  // Load first slide
-  edLoadSlide(0);
-
-  // Show/hide slide navigator
-  var nav = document.getElementById('slideNav');
-  if (E.slides.length > 1) {
-    nav.style.display = 'flex';
-    document.getElementById('slideCounter').textContent = '1 / ' + E.slides.length;
-  } else {
-    nav.style.display = 'none';
-  }
-
-  toast('Todas as ' + E.slides.length + ' slide(s) carregadas!');
-}
-
-function edLoadSlide(idx) {
-  // Save current slide state
-  if (E.slides[E.currentSlide]) {
-    E.slides[E.currentSlide].els = JSON.parse(JSON.stringify(E.els));
-    E.slides[E.currentSlide].nextId = E.nextId;
-  }
-
-  // Load new slide
-  E.currentSlide = idx;
-  var slide = E.slides[idx];
-  if (!slide) return;
-
-  E.els = JSON.parse(JSON.stringify(slide.els));
-  E.nextId = slide.nextId || 1;
-  E.sel = null;
-  E.undoS = [];
-  E.redoS = [];
-
-  // Set background
-  if (slide.bg) {
-    E.canvas.style.backgroundImage = 'url(' + slide.bg + ')';
-    E.canvas.style.backgroundSize = 'cover';
-    E.canvas.style.backgroundPosition = 'center';
-    E.canvas.style.backgroundRepeat = 'no-repeat';
-    E.bgImg = slide.bg;
-  } else {
-    E.canvas.style.backgroundImage = '';
-    E.bgImg = '';
-  }
-  E.canvas.style.background = E.bg;
-
-  // Update counter
-  document.getElementById('slideCounter').textContent = (idx + 1) + ' / ' + E.slides.length;
-
-  edRender();
-  edLayers();
-  edProps();
-}
-
-function edPrevSlide() {
-  if (E.currentSlide > 0) edLoadSlide(E.currentSlide - 1);
-}
-
-function edNextSlide() {
-  if (E.currentSlide < E.slides.length - 1) edLoadSlide(E.currentSlide + 1);
-}
-
-// Editor export
-async function exportEditor() {
-  var fmt = getFmt(), scale = getScale(), qual = getQual();
-  var totalSlides = E.slides.length;
-
-  go('progress');
-  document.getElementById('p-name').textContent = 'Design do Editor';
-  document.getElementById('p-scale').textContent = scale + 'x';
-  document.getElementById('p-fmt').textContent = fmt.toUpperCase() + ' ' + (E.w*scale) + 'x' + (E.h*scale);
-  document.getElementById('p-detail').textContent = 'Preparando...';
-  document.getElementById('pct').textContent = '0%';
-  document.getElementById('bar').style.width = '0%';
-  document.getElementById('p-slides').textContent = '0';
-
-  var sg = document.getElementById('sp-grid');
-  sg.innerHTML = '';
-  for (var i = 0; i < totalSlides; i++) sg.innerHTML += '<div class="sp-item" id="sp' + i + '"><div class="sp-dot"></div><div class="n">' + String(i+1).padStart(2,'0') + '</div></div>';
-
-  // Save current slide state
-  if (E.slides[E.currentSlide]) {
-    E.slides[E.currentSlide].els = JSON.parse(JSON.stringify(E.els));
-    E.slides[E.currentSlide].nextId = E.nextId;
-  }
-
-  state.imgs = [];
-  var t0 = Date.now();
-
-  try {
-    for (var i = 0; i < totalSlides; i++) {
-      var sp = document.getElementById('sp' + i);
-      if (sp) sp.classList.add('active');
-      document.getElementById('p-detail').textContent = 'Renderizando slide ' + (i+1) + ' de ' + totalSlides + '...';
-
-      var blob = await edExportSlide(i, scale, fmt, qual);
-      state.imgs.push({name:'Slide-' + String(i+1).padStart(2,'0') + '.' + fmt, blob:blob, idx:i});
-
-      if (sp) { sp.classList.remove('active'); sp.classList.add('done'); }
-      document.getElementById('p-slides').textContent = i+1;
-      var pct = Math.round(((i+1)/totalSlides)*100);
-      document.getElementById('pct').textContent = pct + '%';
-      document.getElementById('bar').style.width = pct + '%';
-    }
-
-    // Generate PDF/PPTX if needed
-    if (fmt === 'pdf' && typeof jspdf !== 'undefined' && state.imgs.length > 0) {
-      var pw = E.w * scale * 0.75, ph = E.h * scale * 0.75;
-      var orient = E.w >= E.h ? 'landscape' : 'portrait';
-      var pdf = new jspdf.jsPDF({orientation:orient, unit:'pt', format:[pw,ph]});
-      for (var i = 0; i < state.imgs.length; i++) {
-        if (i > 0) pdf.addPage();
-        var du = await blobToDataUrl(state.imgs[i].blob);
-        pdf.addImage(du, 'PNG', 0, 0, pw, ph);
-      }
-      state.pdf = pdf.output('blob');
-    }
-    if ((fmt === 'pptx' || fmt === 'canva') && typeof PptxGenJS !== 'undefined' && state.imgs.length > 0) {
-      var pptx = new PptxGenJS();
-      pptx.defineLayout({name:'C', width:E.w/96, height:E.h/96});
-      pptx.layout = 'C';
-      for (var i = 0; i < state.imgs.length; i++) {
-        var sl = pptx.addSlide();
-        var du = await blobToDataUrl(state.imgs[i].blob);
-        sl.addImage({data:du, x:0, y:0, w:E.w/96, h:E.h/96});
-      }
-      state.pptx = await pptx.write({outputType:'blob'});
-    }
-
-    state.totalSlides += totalSlides; state.totalFiles++;
-    state.hist.unshift({name:'Editor', slides:totalSlides, fmt:fmt.toUpperCase(), scale:scale+'x', date:new Date().toLocaleString('pt-BR')});
-    saveStats(); updateDash(); renderComplete();
-    go('complete');
-    toast('Exportado! ' + totalSlides + ' slide(s)');
-  } catch(e) { console.error(e); toast('Erro na exportacao', 'err'); go('editor'); }
-}
-
-async function edExportSlide(slideIdx, scale, fmt, qual) {
-  var slide = E.slides[slideIdx];
-  if (!slide) throw new Error('Slide not found');
-
-  var imageCache = {};
-
-  // Cache background image
-  if (slide.bg) {
-    imageCache[slide.bg] = await new Promise(function(r) {
-      var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = slide.bg;
-    });
-  }
-
-  // Cache element images
-  for (var i = 0; i < slide.els.length; i++) {
-    var el = slide.els[i];
-    if (el.type === 'image' && el.src && !imageCache[el.src]) {
-      imageCache[el.src] = await new Promise(function(r) {
-        var img = new Image(); img.onload = function() { r(img); }; img.onerror = function() { r(null); }; img.src = el.src;
-      });
-    }
-  }
-
-  var canvas = document.createElement('canvas');
-  canvas.width = E.w * scale; canvas.height = E.h * scale;
-  var ctx = canvas.getContext('2d');
-  ctx.scale(scale, scale);
-  ctx.fillStyle = E.bg; ctx.fillRect(0, 0, E.w, E.h);
-
-  // Draw background image
-  if (slide.bg && imageCache[slide.bg]) {
-    var bgImg = imageCache[slide.bg];
-    var imgRatio = bgImg.naturalWidth / bgImg.naturalHeight;
-    var canvasRatio = E.w / E.h;
-    var dw, dh, dx, dy;
-    if (imgRatio > canvasRatio) { dh = E.h; dw = E.h * imgRatio; dx = (E.w - dw) / 2; dy = 0; }
-    else { dw = E.w; dh = E.w / imgRatio; dx = 0; dy = (E.h - dh) / 2; }
-    ctx.drawImage(bgImg, dx, dy, dw, dh);
-  }
-
-  // Draw elements
-  for (var i = 0; i < slide.els.length; i++) {
-    var el = slide.els[i];
-    if (!el.visible) continue;
-    ctx.save();
-    ctx.globalAlpha = el.opacity;
-    ctx.translate(el.x + el.w/2, el.y + el.h/2);
-    ctx.rotate(el.rot * Math.PI / 180);
-    ctx.translate(-el.w/2, -el.h/2);
-
-    if (el.type === 'text') {
-      ctx.font = el.fontWeight + ' ' + el.fontSize + 'px ' + el.fontFamily;
-      ctx.fillStyle = el.color; ctx.textAlign = el.align; ctx.textBaseline = 'middle';
-      var tx = el.align === 'center' ? el.w/2 : el.align === 'right' ? el.w : 0;
-      var lines = el.text.split('\n'); var lh = el.fontSize * 1.4;
-      lines.forEach(function(line, j) { ctx.fillText(line, tx, el.h/2 + (j-(lines.length-1)/2)*lh); });
-    } else if (el.type === 'rect') {
-      ctx.fillStyle = el.fill;
-      if (el.radius > 0) { ctx.beginPath(); ctx.moveTo(el.radius,0); ctx.lineTo(el.w-el.radius,0); ctx.quadraticCurveTo(el.w,0,el.w,el.radius); ctx.lineTo(el.w,el.h-el.radius); ctx.quadraticCurveTo(el.w,el.h,el.w-el.radius,el.h); ctx.lineTo(el.radius,el.h); ctx.quadraticCurveTo(0,el.h,0,el.h-el.radius); ctx.lineTo(0,el.radius); ctx.quadraticCurveTo(0,0,el.radius,0); ctx.closePath(); ctx.fill(); }
-      else ctx.fillRect(0,0,el.w,el.h);
-      if (el.strokeWidth > 0) { ctx.strokeStyle = el.stroke; ctx.lineWidth = el.strokeWidth; ctx.stroke(); }
-    } else if (el.type === 'circle') {
-      ctx.beginPath(); ctx.ellipse(el.w/2,el.h/2,el.w/2,el.h/2,0,0,Math.PI*2);
-      ctx.fillStyle = el.fill; ctx.fill();
-      if (el.strokeWidth > 0) { ctx.strokeStyle = el.stroke; ctx.lineWidth = el.strokeWidth; ctx.stroke(); }
-    } else if (el.type === 'image' && el.src && imageCache[el.src]) {
-      ctx.drawImage(imageCache[el.src], 0, 0, el.w, el.h);
-    }
-    ctx.restore();
-  }
-
-  var mime = fmt === 'png' ? 'image/png' : fmt === 'jpg' ? 'image/jpeg' : 'image/webp';
-  return new Promise(function(r) { canvas.toBlob(function(b) { r(b); }, mime, qual); });
-}
-
-// ========== BATCH ==========
-function handleBatch(files) {
-  state.batchFiles = Array.from(files).filter(function(f) { return f.name.match(/\.html?$/i); });
-  if (!state.batchFiles.length) { toast('Nenhum HTML', 'err'); return; }
-  document.getElementById('batchTitle').textContent = 'Arquivos (' + state.batchFiles.length + ')';
-  document.getElementById('batchList').style.display = 'block';
-  var c = document.getElementById('batchItems');
-  c.innerHTML = '';
-  state.batchFiles.forEach(function(f, i) {
-    c.innerHTML += '<div class="batch-item" id="bi' + i + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><div><div class="name">' + f.name + '</div><div class="meta">' + (f.size/1024).toFixed(1) + ' KB</div></div><span class="badge ready">Pronto</span></div>';
+  // Update top nav links
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.style.borderBottomColor = 'transparent';
+    if (link.dataset.page === page) link.style.borderBottomColor = 'var(--primary)';
   });
-}
-function clearBatch() { document.getElementById('batchList').style.display = 'none'; state.batchFiles = []; }
-async function doBatch() {
-  for (var i = 0; i < state.batchFiles.length; i++) {
-    var f = state.batchFiles[i];
-    var bi = document.getElementById('bi' + i);
-    if (bi) { var b = bi.querySelector('.badge'); b.textContent = 'Exportando...'; b.className = 'badge working'; }
-    var html = await new Promise(function(r) { var reader = new FileReader(); reader.onload = function(e) { r(e.target.result); }; reader.readAsText(f); });
-    state.analysis = analyzeHTML(html, f.name);
-    state.fileName = f.name;
-    try { await doExport(); if (bi) { var b = bi.querySelector('.badge'); b.textContent = 'OK'; b.className = 'badge done'; } }
-    catch(e) { if (bi) { var b = bi.querySelector('.badge'); b.textContent = 'Erro'; b.className = 'badge error'; } }
-  }
-  toast('Lote concluido: ' + state.batchFiles.length + ' arquivos');
-  go('dash');
-}
-
-// ========== STATS ==========
-function loadStats() { try { var s = JSON.parse(localStorage.getItem('vb-stats') || '{}'); if (s.ts) state.totalSlides = s.ts; if (s.tf) state.totalFiles = s.tf; if (s.h) state.hist = s.h; updateDash(); } catch(e) {} }
-function saveStats() { try { localStorage.setItem('vb-stats', JSON.stringify({ts:state.totalSlides, tf:state.totalFiles, h:state.hist.slice(0,50)})); } catch(e) {} }
-function updateDash() {
-  document.getElementById('st-slides').textContent = state.totalSlides;
-  document.getElementById('st-files').textContent = state.totalFiles;
-  document.getElementById('st-rate').textContent = state.totalFiles > 0 ? '100%' : '-';
-  if (state.hist.length) document.getElementById('st-last').textContent = state.hist[0].date.split(' ')[0];
-  var h = document.getElementById('history');
-  if (!state.hist.length) { h.innerHTML = '<div class="history">Nenhuma exportacao ainda</div>'; return; }
-  h.innerHTML = state.hist.slice(0,10).map(function(x) { return '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:#1A1A1E;border:1px solid #2A2A30;border-radius:8px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:600;font-size:13px">' + x.name + '</div><div style="font-size:11px;color:#6A6A74">' + x.slides + ' slides ' + x.fmt + ' ' + x.scale + ' ' + x.date + '</div></div><span style="font-size:11px;color:#22C55E">OK</span></div>'; }).join('');
-}
-
-// ========== THEME ==========
-function toggleTheme() {
-  document.body.classList.toggle('light');
-  var isLight = document.body.classList.contains('light');
-  try { localStorage.setItem('vb-theme', isLight ? 'light' : 'dark'); } catch(e) {}
-  updateThemeBtn(isLight);
-}
-
-function updateThemeBtn(isLight) {
-  var icon = document.getElementById('themeIcon');
-  var label = document.getElementById('themeLabel');
-  if (isLight) {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-    label.textContent = 'Modo Escuro';
+  
+  // Show/hide bottom nav and top header
+  const bottomNav = document.getElementById('bottomNav');
+  const topHeader = document.getElementById('topHeader');
+  if (page === 'login') {
+    bottomNav.style.display = 'none';
+    topHeader.style.display = 'none';
   } else {
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
-    label.textContent = 'Modo Claro';
+    bottomNav.style.display = 'flex';
+  }
+  
+  currentPage = page;
+  window.scrollTo(0, 0);
+  window.location.hash = page;
+}
+
+// ===== AUTH =====
+function handleGoogleLogin() {
+  showToast('Conectando com Google...');
+  setTimeout(() => navigateTo('dashboard'), 1000);
+}
+
+function handleEmailLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const code = document.getElementById('loginCode').value;
+  if (email && code) {
+    showToast('Entrando...');
+    setTimeout(() => navigateTo('dashboard'), 800);
+  } else {
+    showToast('Preencha email e código');
   }
 }
 
-// Load saved theme
-try {
-  var savedTheme = localStorage.getItem('vb-theme');
-  if (savedTheme === 'light') { document.body.classList.add('light'); updateThemeBtn(true); }
-} catch(e) {}
+function handleLogout() {
+  navigateTo('login');
+  showToast('Desconectado');
+}
 
-// ========== INIT ==========
-loadStats();
-console.log('[VetBrainX Export] Pronto');
+// ===== FLASHCARD =====
+let isFlipped = false;
+const flashcards = [
+  { q: 'Adicione seu primeiro flashcard para começar a revisar', a: 'Use o Laboratório para gerar cards automaticamente ou crie manualmente.' }
+];
+let currentCard = 0;
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  const front = document.getElementById('flashcard-front');
+  const back = document.getElementById('flashcard-back');
+  if (isFlipped) {
+    front.classList.add('hidden');
+    back.classList.remove('hidden');
+  } else {
+    front.classList.remove('hidden');
+    back.classList.add('hidden');
+  }
+}
+
+function rateCard(rating) {
+  currentCard = (currentCard + 1) % flashcards.length;
+  document.getElementById('flashcard-question').textContent = flashcards[currentCard].q;
+  document.getElementById('flashcard-back').querySelector('h2').textContent = flashcards[currentCard].a;
+  isFlipped = false;
+  document.getElementById('flashcard-front').classList.remove('hidden');
+  document.getElementById('flashcard-back').classList.add('hidden');
+  showToast(`Card avaliado: ${rating}`);
+}
+
+// ===== QUIZ =====
+function startQuiz(mode) {
+  showToast(`Iniciando ${mode}...`);
+  navigateTo('flashcards');
+}
+
+// ===== TOAST =====
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ===== HEATMAP =====
+function generateHeatmap() {
+  const heatmap = document.getElementById('heatmap');
+  if (!heatmap) return;
+  for (let i = 0; i < 49; i++) {
+    const cell = document.createElement('div');
+    cell.style.cssText = `width:12px;height:12px;border-radius:2px;background:var(--surface-variant)`;
+    heatmap.appendChild(cell);
+  }
+}
+
+// ===== INIT =====
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.slice(1);
+  if (hash && pageMap[hash]) navigateTo(hash);
+});
+
+// Load from hash or default
+const initialPage = window.location.hash.slice(1);
+if (initialPage && pageMap[initialPage]) {
+  navigateTo(initialPage);
+} else {
+  navigateTo('login');
+}
+
+generateHeatmap();
 </script>
 </body>
 </html>
